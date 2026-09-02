@@ -4,9 +4,10 @@ The Williams deck as delivered, and everything needed to rebuild it — **except
 the client data room**, which is not committed. The extractors expect it at
 `../OMega/99-Williams Data Room/`.
 
-**This repo is private.** It contains Omega Pacific's derived drill assays
-(5,234 sampled intervals), geochemistry and geophysics. It must not be made
-public without their agreement.
+**This repo is public, and it contains Omega Pacific's derived drill assays
+(5,234 sampled intervals), geochemistry, geophysics and tenure.** Published at
+the issuer's direction. Anyone can clone it; treat every figure in `data/` as
+disclosed.
 
     williams/
       index.html            the deck
