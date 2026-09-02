@@ -1,0 +1,200 @@
+{
+ "products": [
+  {
+   "key": "mag_rtp",
+   "label": "Magnetics \u2014 RTP",
+   "body": "2020 heliborne magnetics, reduced to pole. Magnetite destruction over the altered corridors reads as the magnetic low.",
+   "file": "data/geophys/mag_rtp.png",
+   "file_m": "data/geophys/mag_rtp@m.png",
+   "epsg": 32609,
+   "cell_m": 5.08,
+   "rect": [
+    -127.9042259,
+    57.7552563,
+    -127.5115604,
+    57.8435755
+   ],
+   "utm_extent": [
+    565210.0,
+    6401990.0,
+    588359.5,
+    6412266.9
+   ],
+   "px": [
+    2400,
+    1065
+   ],
+   "provenance": "2020 airborne (Precision GeoSurveys, 25 m grid)",
+   "matte_removed_px": 1146016,
+   "source": "21198_EXT_RTP_25m.tif"
+  },
+  {
+   "key": "mag_cvg",
+   "label": "Magnetics \u2014 vertical gradient",
+   "body": "The derivative sharpens contacts and structure that the total field smooths over.",
+   "file": "data/geophys/mag_cvg.png",
+   "file_m": "data/geophys/mag_cvg@m.png",
+   "epsg": 32609,
+   "cell_m": 5.08,
+   "rect": [
+    -127.9042259,
+    57.7552563,
+    -127.5115604,
+    57.8435755
+   ],
+   "utm_extent": [
+    565210.0,
+    6401990.0,
+    588359.5,
+    6412266.9
+   ],
+   "px": [
+    2400,
+    1065
+   ],
+   "provenance": "2020 airborne, 25 m grid",
+   "matte_removed_px": 1146279,
+   "source": "21198_EXT_CVG_25m.tif"
+  },
+  {
+   "key": "mag_tmi",
+   "label": "Magnetics \u2014 TMI",
+   "body": "Total magnetic intensity as flown.",
+   "file": "data/geophys/mag_tmi.png",
+   "file_m": "data/geophys/mag_tmi@m.png",
+   "epsg": 32609,
+   "cell_m": 5.08,
+   "rect": [
+    -127.9042259,
+    57.7552563,
+    -127.5115604,
+    57.8435755
+   ],
+   "utm_extent": [
+    565210.0,
+    6401990.0,
+    588359.5,
+    6412266.9
+   ],
+   "px": [
+    2400,
+    1065
+   ],
+   "provenance": "2020 airborne, 25 m grid",
+   "matte_removed_px": 1145999,
+   "source": "21198_EXT_TMI_25m.tif"
+  },
+  {
+   "key": "ip_chg_50",
+   "label": "IP chargeability \u2014 50 m",
+   "body": "Chargeability is the sulphide proxy. This is the layer the 2021\u20132024 holes were sited on.",
+   "file": "data/geophys/ip_chg_50.png",
+   "file_m": "data/geophys/ip_chg_50@m.png",
+   "epsg": 3156,
+   "cell_m": 1.5,
+   "rect": [
+    -127.7801662,
+    57.7947834,
+    -127.7033895,
+    57.8197183
+   ],
+   "utm_extent": [
+    572514.2,
+    6406515.8,
+    577024.8,
+    6409376.3
+   ],
+   "px": [
+    2400,
+    1522
+   ],
+   "provenance": "2021 ground DCIP (Walcott lines), inverted",
+   "matte_removed_px": 684249,
+   "source": "Copaur-Williams_Walcott-IP-2021_CHG-Depth-050m_nad83z09.tif"
+  },
+  {
+   "key": "ip_chg_100",
+   "label": "IP chargeability \u2014 100 m",
+   "body": "The same volume one depth slice down: the anomaly strengthens rather than fades, which is why it was drilled.",
+   "file": "data/geophys/ip_chg_100.png",
+   "file_m": "data/geophys/ip_chg_100@m.png",
+   "epsg": 3156,
+   "cell_m": 1.5,
+   "rect": [
+    -127.7801662,
+    57.7947834,
+    -127.7033895,
+    57.8197183
+   ],
+   "utm_extent": [
+    572514.2,
+    6406515.8,
+    577024.8,
+    6409376.3
+   ],
+   "px": [
+    2400,
+    1522
+   ],
+   "provenance": "2021 ground DCIP, inverted",
+   "matte_removed_px": 685824,
+   "source": "Copaur-Williams_Walcott-IP-2021_CHG-Depth-100m_nad83z09.tif"
+  },
+  {
+   "key": "ip_res_100",
+   "label": "IP resistivity \u2014 100 m",
+   "body": "Resistivity separates silicified rock from the conductive, clay-altered ground around it.",
+   "file": "data/geophys/ip_res_100.png",
+   "file_m": "data/geophys/ip_res_100@m.png",
+   "epsg": 3156,
+   "cell_m": 1.5,
+   "rect": [
+    -127.7801662,
+    57.7947834,
+    -127.7033895,
+    57.8197183
+   ],
+   "utm_extent": [
+    572514.2,
+    6406515.8,
+    577024.8,
+    6409376.3
+   ],
+   "px": [
+    2400,
+    1522
+   ],
+   "provenance": "2021 ground DCIP, inverted",
+   "matte_removed_px": 687124,
+   "source": "Copaur-Williams_Walcott-IP-2021_RES-Depth-100m_nad83z09.tif"
+  },
+  {
+   "key": "vtem_rtp",
+   "label": "VTEM magnetics \u2014 RTP",
+   "body": "The 2021 VTEM flight, wider than the 2020 block and the reason the ROI target is on the map at all.",
+   "file": "data/geophys/vtem_rtp.png",
+   "file_m": "data/geophys/vtem_rtp@m.png",
+   "epsg": 32609,
+   "cell_m": 10.0,
+   "rect": [
+    -127.9065028,
+    57.7229588,
+    -127.6849593,
+    57.8270358
+   ],
+   "utm_extent": [
+    565132.5,
+    6398392.5,
+    578102.5,
+    6410212.5
+   ],
+   "px": [
+    1297,
+    1182
+   ],
+   "provenance": "2021 VTEM Plus (Geotech), 10 m grid",
+   "matte_removed_px": 669313,
+   "source": "Copaur-Williams_VTEM-RMI-RTP_wgs84z9.tif"
+  }
+ ]
+}

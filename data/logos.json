@@ -1,0 +1,38 @@
+{
+ "OMEGA PACIFIC RESOURCES INC": {
+  "file": "data/logos/omega-pacific-resources-inc.png",
+  "w": 146,
+  "h": 128,
+  "plate": "dark"
+ },
+ "THESIS GOLD & SILVER INC.": {
+  "file": "data/logos/thesis-gold-silver-inc.png",
+  "w": 305,
+  "h": 128,
+  "plate": "light"
+ },
+ "EAGLE PLAINS RESOURCES LTD.": {
+  "file": "data/logos/eagle-plains-resources-ltd.png",
+  "w": 153,
+  "h": 128,
+  "plate": "light"
+ },
+ "AURICO METALS INC.": {
+  "file": "data/logos/aurico-metals-inc.png",
+  "w": 227,
+  "h": 128,
+  "plate": "light"
+ },
+ "TDG BC ASSETS CORP.": {
+  "file": "data/logos/tdg-bc-assets-corp.png",
+  "w": 157,
+  "h": 128,
+  "plate": "light"
+ },
+ "AURORA MINERALS LTD.": {
+  "file": "data/logos/aurora-minerals-ltd.png",
+  "w": 422,
+  "h": 126,
+  "plate": "light"
+ }
+}

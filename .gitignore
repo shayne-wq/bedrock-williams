@@ -1,0 +1,5 @@
+.DS_Store
+*.log
+# The client data room itself is never committed — this repo holds what was
+# DERIVED from it, and the source stays where Omega Pacific put it.
+../OMega/

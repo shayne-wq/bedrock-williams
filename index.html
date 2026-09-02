@@ -1,0 +1,2089 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Williams — Omega Pacific · Bedrock Present</title>
+<meta name="robots" content="noindex, nofollow">
+<script>window.CESIUM_BASE_URL='https://cdn.jsdelivr.net/npm/cesium@1.120/Build/Cesium/';</script>
+<link href="https://cdn.jsdelivr.net/npm/cesium@1.120/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/cesium@1.120/Build/Cesium/Cesium.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,300;6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#07090A; --ink2:#0D1012; --line:rgba(255,255,255,.14);
+  --fg:#EDEEEC; --fg2:#C6CAC5; --fg3:#8E948E;
+  --gold:#C99A3A; --r:3px;
+}
+*{box-sizing:border-box}
+html,body,#cesiumContainer{height:100%;width:100%;margin:0;overflow:hidden;background:var(--ink)}
+/* Scrims. The chapter rail sits over a satellite basemap whose brightness
+   changes with every camera move, so legibility cannot be left to the terrain. */
+#scrimL,#scrimB{position:fixed;z-index:30;pointer-events:none}
+#scrimL{top:0;left:0;width:300px;height:100%;
+  background:linear-gradient(90deg,rgba(7,9,10,.88) 0%,rgba(7,9,10,.62) 46%,transparent 100%)}
+#scrimB{left:0;right:0;bottom:0;height:210px;
+  background:linear-gradient(0deg,rgba(7,9,10,.72) 0%,transparent 100%)}
+#scrimR{position:fixed;z-index:30;pointer-events:none;top:0;right:0;width:300px;height:100%;
+  background:linear-gradient(270deg,rgba(7,9,10,.72) 0%,rgba(7,9,10,.34) 52%,transparent 100%)}
+body{font-family:Archivo,system-ui,sans-serif;color:var(--fg);-webkit-font-smoothing:antialiased}
+.cesium-widget-credits,.cesium-viewer-bottom{display:none!important}
+.cesium-widget canvas{cursor:grab}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+button{font:inherit;color:inherit}
+
+/* ---- brand ---- */
+#brand{position:fixed;top:20px;left:24px;z-index:40;pointer-events:none;
+  display:flex;align-items:center;gap:14px}
+#brand img{height:46px;width:auto;display:block}
+#brand .r{padding-left:14px;border-left:1px solid rgba(255,255,255,.16)}
+#brand .w{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.28em;
+  color:var(--gold);text-transform:uppercase}
+#brand .n{margin-top:5px;font-size:20px;font-weight:600;line-height:1.15;letter-spacing:-.02em}
+#brand .s{margin-top:2px;font-size:12px;color:var(--fg3)}
+
+/* ---- chapter rail ---- */
+#rail{position:fixed;top:118px;left:24px;bottom:206px;z-index:40;width:216px;
+  overflow-y:auto;scrollbar-width:none;padding-right:6px}
+#rail::-webkit-scrollbar{display:none}
+#rail .sec{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.24em;
+  color:var(--fg3);text-transform:uppercase;margin:20px 0 8px;padding-bottom:6px;
+  border-bottom:1px solid rgba(255,255,255,.09)}
+#rail .sec:first-child{margin-top:0}
+#rail button{display:flex;gap:9px;align-items:baseline;width:100%;text-align:left;
+  background:none;border:0;padding:6px 0;cursor:pointer;color:var(--fg3);
+  font-size:12.5px;line-height:1.3;transition:color .18s}
+#rail button:hover{color:var(--fg2)}
+#rail button[aria-current="true"]{color:var(--fg)}
+#rail button[aria-current="true"] .num{color:var(--gold)}
+#rail .num{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,.28);
+  width:18px;flex:none}
+
+/* ---- caption ---- */
+#right{position:fixed;right:24px;bottom:26px;z-index:40;width:min(440px,calc(100vw - 300px));
+  display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+#cap{width:100%;background:rgba(7,9,10,.86);backdrop-filter:blur(14px);
+  border:1px solid var(--line);border-radius:var(--r);padding:22px 24px 20px}
+#cap .ey{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.22em;
+  color:var(--gold);text-transform:uppercase}
+#cap h2{margin:11px 0 9px;font-size:25px;font-weight:600;letter-spacing:-.022em;
+  line-height:1.14;text-wrap:balance}
+#cap p{margin:0;font-family:Newsreader,Georgia,serif;font-size:17px;line-height:1.56;
+  color:var(--fg2);text-wrap:pretty}
+#cap .fig{display:flex;flex-wrap:wrap;gap:0 26px;margin-top:16px;padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.09)}
+#cap .fig div{min-width:0}
+#cap .fig b{display:block;font-family:'JetBrains Mono',monospace;font-size:15px;
+  font-weight:500;color:var(--fg)}
+#cap .fig span{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--fg3);margin-top:4px}
+
+/* ---- transport ---- */
+#nav{display:flex;gap:8px;align-items:center}
+.btn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;background:rgba(255,255,255,.06);border:1px solid var(--line);
+  border-radius:var(--r);padding:11px 17px;cursor:pointer;transition:background .18s,transform .06s}
+.btn:hover{background:rgba(255,255,255,.12)}
+.btn:active{transform:translateY(1px)}
+.btn[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#12100B}
+#nav .count{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;
+  color:var(--fg3);min-width:56px;text-align:center}
+
+/* ---- layer panel ---- */
+#layers{position:fixed;top:64px;right:24px;z-index:41}
+#panel{position:fixed;top:110px;right:24px;z-index:41;width:452px;display:none;
+  background:rgba(7,9,10,.95);backdrop-filter:blur(16px);border:1px solid var(--line);
+  border-radius:var(--r);padding:16px 18px 14px;
+  grid-template-columns:1fr 1fr;gap:0 24px;
+  max-height:calc(100vh - 400px);overflow-y:auto;scrollbar-width:thin}
+#panel.open{display:grid}
+#panel .col{min-width:0}
+#panel h3{margin:0 0 10px;font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--fg3);font-weight:400}
+#panel .col + .col{padding-left:24px;border-left:1px solid rgba(255,255,255,.09)}
+.lay{display:flex;align-items:center;gap:9px;width:100%;background:none;border:0;
+  padding:6px 0;cursor:pointer;font-size:12.5px;color:var(--fg3);text-align:left;transition:color .18s}
+.lay:hover{color:var(--fg2)}
+.lay[aria-pressed="true"]{color:var(--fg)}
+.lay i{width:9px;height:9px;flex:none;border-radius:2px;border:1px solid rgba(255,255,255,.3)}
+.lay[aria-pressed="true"] i{background:var(--gold);border-color:var(--gold)}
+#panel .op{display:flex;align-items:center;gap:9px;margin-top:10px}
+#panel .op input{flex:1;accent-color:var(--gold);height:2px}
+#panel .op label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--fg3)}
+
+/* ---- legend ---- */
+#zkey{position:fixed;left:24px;bottom:140px;z-index:40;display:none;gap:12px;align-items:center;
+  background:rgba(7,9,10,.82);backdrop-filter:blur(14px);border:1px solid var(--line);
+  border-radius:var(--r);padding:9px 14px}
+#zkey.on{display:flex}
+#zkey .k{display:flex;align-items:center;gap:6px}
+#zkey .k i{width:11px;height:11px;border-radius:2px}
+#zkey span{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--fg2)}
+#legend{position:fixed;left:24px;top:auto;bottom:96px;z-index:40;display:none;
+  gap:12px;align-items:center;background:rgba(7,9,10,.82);backdrop-filter:blur(14px);
+  border:1px solid var(--line);border-radius:var(--r);padding:9px 14px}
+#legend.on{display:flex}
+#legend .k{display:flex;align-items:center;gap:6px}
+#legend .k i{width:11px;height:11px;border-radius:2px}
+#legend span{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--fg2);white-space:nowrap}
+
+/* ---- text mode ---- */
+#txt{position:fixed;inset:0;z-index:70;overflow-y:auto;background:var(--ink);
+  padding:56px 24px 72px;-webkit-overflow-scrolling:touch}
+#txt .in{max-width:720px;margin:0 auto}
+#txt .in>img{height:76px;width:auto;display:block;margin:0 auto 22px}
+#txt .w{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.3em;
+  color:var(--gold);text-transform:uppercase;text-align:center}
+#txt h1{margin:10px 0 6px;font-size:38px;font-weight:600;letter-spacing:-.03em;
+  text-align:center;line-height:1.1}
+#txt .s{font-size:13.5px;color:var(--fg3);text-align:center}
+#txt #retry3d{margin:28px 0 0;font:12px ui-monospace,'JetBrains Mono',monospace;
+  letter-spacing:.14em;text-transform:uppercase;background:var(--gold);color:#12100B;
+  border:0;border-radius:var(--r);padding:15px 18px;width:100%;cursor:pointer}
+#txt #retry3d:active{transform:translateY(1px)}
+#txt .warn{margin:14px 0 8px;padding:16px 18px;border:1px solid rgba(201,154,58,.4);
+  border-radius:var(--r);background:rgba(201,154,58,.07);
+  font-size:14px;line-height:1.6;color:var(--fg2)}
+#txt .warn b{color:var(--fg)}
+#txt h3{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--gold);margin:44px 0 4px;font-weight:400;
+  padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.1)}
+#txt article{padding:24px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+#txt img.shot{display:block;width:100%;height:auto;margin:14px 0 16px;border-radius:var(--r);
+  border:1px solid rgba(255,255,255,.12);background:#0D1012}
+#txt .ey{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--fg3)}
+#txt h2{margin:9px 0 10px;font-size:23px;font-weight:600;letter-spacing:-.02em;
+  line-height:1.18;text-wrap:balance}
+#txt article p{margin:0;font-family:Newsreader,Georgia,serif;font-size:17px;
+  line-height:1.6;color:var(--fg2);text-wrap:pretty}
+#txt .fig{display:flex;flex-wrap:wrap;gap:14px 26px;margin-top:16px}
+#txt .fig b{display:block;font-family:'JetBrains Mono',monospace;font-size:15px;
+  font-weight:500;color:var(--fg)}
+#txt .fig span{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--fg3);margin-top:4px}
+#txt table{width:100%;border-collapse:collapse;font-size:13.5px}
+#txt td{padding:9px 12px 9px 0;border-bottom:1px solid rgba(255,255,255,.08);
+  vertical-align:top;color:var(--fg2);line-height:1.55}
+#txt td:first-child{width:180px;color:var(--fg);font-family:'JetBrains Mono',monospace;font-size:11.5px}
+#txt .lede,#txt .note{font-family:Newsreader,Georgia,serif;font-size:16px;
+  line-height:1.6;color:var(--fg2)}
+#txt .foot{margin-top:52px;padding-top:22px;border-top:1px solid rgba(255,255,255,.1)}
+#txt .foot img{height:22px;width:auto;opacity:.8;display:block}
+#txt .diag{margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:9.5px;
+  line-height:1.6;color:rgba(142,148,142,.62);word-break:break-word}
+@media (max-width:560px){
+  #txt{padding:34px 16px 56px}
+  #txt h1{font-size:31px} #txt h2{font-size:20px} #txt article p{font-size:16px}
+  #txt td:first-child{width:auto;display:block;padding-bottom:2px;border:0}
+  #txt td{display:block;padding-right:0}
+}
+
+/* ---- camera authoring panel ---- */
+#admin{position:fixed;left:24px;top:118px;z-index:60;width:236px;
+  background:rgba(7,9,10,.95);backdrop-filter:blur(16px);
+  border:1px solid var(--gold);border-radius:var(--r);padding:14px 15px}
+#admin .hd{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--gold)}
+#admin .ro{margin-top:9px;font-family:'JetBrains Mono',monospace;font-size:11px;
+  line-height:1.55;color:var(--fg2);white-space:pre-wrap}
+#admin .bt{display:flex;gap:7px;margin-top:10px}
+#admin button{flex:1;font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.08);
+  color:var(--fg);border:1px solid var(--line);border-radius:var(--r);
+  padding:9px 6px;cursor:pointer}
+#admin button:hover{background:rgba(255,255,255,.16)}
+#admin #ad_lock{background:var(--gold);border-color:var(--gold);color:#12100B}
+#admin .st{margin-top:10px;font-size:11px;line-height:1.5;color:var(--fg3)}
+
+/* ---- issuer mark ---- */
+#mark{position:fixed;left:24px;bottom:26px;z-index:40;pointer-events:none}
+#mark img{height:22px;width:auto;display:block;opacity:.8}
+
+/* ---- stage / status ---- */
+#stat{position:fixed;inset:0;z-index:60;display:grid;place-items:center;
+  background:var(--ink);transition:opacity .5s;pointer-events:none}
+#stat.gone{opacity:0}
+#stat .in{text-align:center}
+#stat .in img{height:88px;width:auto;display:block;margin:0 auto 24px}
+#stat .w{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.34em;
+  color:var(--gold);text-transform:uppercase}
+#stat h1{margin:12px 0 8px;font-size:44px;font-weight:600;letter-spacing:-.03em;line-height:1.08}
+#stat .s{font-size:14px;color:var(--fg3)}
+#stat .p{margin-top:26px;font-family:'JetBrains Mono',monospace;font-size:11px;
+  letter-spacing:.14em;color:var(--fg3);text-transform:uppercase}
+#stat .by{position:absolute;left:0;right:0;bottom:44px;display:flex;justify-content:center}
+#stat .by img{height:24px;width:auto;opacity:.72}
+#stat.err .p{color:#D98A72;text-transform:none;letter-spacing:.02em;max-width:38ch;
+  font-family:Archivo,sans-serif;font-size:13px;line-height:1.5}
+
+/* ---- stage badge: exploration, and what that means ---- */
+#stage{position:fixed;top:22px;right:24px;z-index:40;display:flex;gap:9px;align-items:center;
+  background:rgba(7,9,10,.82);backdrop-filter:blur(14px);border:1px solid var(--line);
+  border-radius:var(--r);padding:9px 14px}
+#stage i{width:6px;height:6px;border-radius:50%;background:var(--gold);flex:none}
+#stage span{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--fg2)}
+
+/* ---- provenance drawer ---- */
+#prov{position:fixed;inset:0;z-index:55;background:rgba(7,9,10,.95);
+  backdrop-filter:blur(8px);overflow-y:auto;padding:72px 24px 64px;display:none}
+#prov.on{display:block}
+#prov .in{max-width:760px;margin:0 auto}
+#prov h2{font-size:27px;font-weight:600;letter-spacing:-.022em;margin:0 0 6px}
+#prov .lede{font-family:Newsreader,Georgia,serif;font-size:17px;line-height:1.6;
+  color:var(--fg2);margin:0 0 30px;max-width:68ch}
+#prov h3{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--gold);margin:30px 0 12px;font-weight:400}
+#prov table{width:100%;border-collapse:collapse;font-size:13px}
+#prov td{padding:9px 12px 9px 0;border-bottom:1px solid rgba(255,255,255,.08);
+  vertical-align:top;color:var(--fg2);line-height:1.5}
+#prov td:first-child{width:210px;color:var(--fg);font-family:'JetBrains Mono',monospace;
+  font-size:11.5px}
+#prov .close{position:fixed;top:22px;right:24px}
+#prov .note{font-family:Newsreader,Georgia,serif;font-size:16px;line-height:1.6;
+  color:var(--fg2);max-width:68ch;margin:14px 0}
+
+/* ---- hole readout on hover ---- */
+#tip{position:fixed;z-index:45;pointer-events:none;display:none;
+  background:rgba(7,9,10,.94);border:1px solid var(--line);border-radius:var(--r);
+  padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;
+  color:var(--fg2);white-space:pre}
+#tip b{color:var(--gold);font-weight:500}
+
+@media (max-width:1240px){
+  #right{width:min(410px,calc(100vw - 300px))} #cap h2{font-size:22px} #cap p{font-size:16px}
+}
+@media (max-width:900px){
+  #rail,#mark{display:none}
+  #panel{top:auto;bottom:14px;left:14px;right:14px;width:auto;max-height:52vh;
+    grid-template-columns:1fr}
+  #panel .col + .col{padding-left:0;border-left:0;margin-top:16px;
+    padding-top:14px;border-top:1px solid rgba(255,255,255,.09)}
+  #right{left:14px;right:14px;bottom:20px;width:auto}
+  #cap{padding:17px 18px 15px}
+  #scrimL,#scrimR{display:none}
+  #cap h2{font-size:20px} #cap p{font-size:15px}
+  #nav{width:100%;justify-content:space-between}
+  #brand{top:16px;left:16px} #stage{top:16px;right:16px}
+  #legend{left:14px;right:14px;bottom:150px;flex-wrap:wrap}
+  #zkey{display:none!important}
+}
+@media (prefers-reduced-motion:reduce){
+  #stat{transition:none}
+}
+</style>
+
+<div id="cesiumContainer"></div>
+<div id="scrimL"></div>
+<div id="scrimB"></div>
+<div id="scrimR"></div>
+
+<div id="brand">
+  <img src="data/omega-mark.png" alt="Omega Pacific Resources">
+  <div class="r">
+    <div class="w">Omega Pacific Resources</div>
+    <div class="n">Williams</div>
+    <div class="s">Toodoggone District, British Columbia</div>
+  </div>
+</div>
+
+<div id="stage"><i></i><span>Exploration stage</span></div>
+
+<nav id="rail" aria-label="Chapters"></nav>
+
+<button class="btn" id="layers" aria-expanded="false" aria-controls="panel">Layers</button>
+
+<div id="panel">
+  <div class="col">
+    <h3>Geophysics</h3><div id="geo"></div>
+    <div class="op"><label for="gop">Opacity</label>
+      <input id="gop" type="range" min="0" max="100" value="72" aria-label="Geophysics opacity"></div>
+  </div>
+  <div class="col">
+    <h3>Ground truth</h3><div id="lays"></div>
+    <div class="op"><label for="gnd">Ground</label>
+      <input id="gnd" type="range" min="12" max="100" value="100" aria-label="Ground opacity"></div>
+  </div>
+</div>
+
+<div id="legend" aria-live="polite"></div>
+<div id="zkey" aria-live="polite"></div>
+
+<div id="right">
+  <div id="nav">
+    <button class="btn" id="prov_o">Sources</button>
+    <button class="btn" id="editbtn" aria-pressed="false">Edit</button>
+    <button class="btn" id="play" aria-pressed="false">Play</button>
+    <button class="btn" id="prev" aria-label="Previous chapter">←</button>
+    <span class="count mono" id="count">1 / 1</span>
+    <button class="btn" id="next" aria-label="Next chapter">→</button>
+  </div>
+  <section id="cap" aria-live="polite">
+    <div class="ey" id="cap_e"></div>
+    <h2 id="cap_t"></h2>
+    <p id="cap_b"></p>
+    <div class="fig" id="cap_f"></div>
+  </section>
+</div>
+
+<div id="mark"><img src="data/bedrock-watermark.png" alt="Powered by Bedrock"></div>
+
+<div id="tip"></div>
+
+<div id="prov" role="dialog" aria-modal="true" aria-label="Sources">
+  <button class="btn close" id="prov_c">Close</button>
+  <div class="in" id="prov_in"></div>
+</div>
+
+<div id="stat">
+  <div class="in">
+    <img src="data/omega-mark.png" alt="Omega Pacific Resources">
+    <div class="w">Omega Pacific Resources</div>
+    <h1>Williams</h1>
+    <div class="s">Toodoggone District, British Columbia</div>
+    <div class="p" id="stat_p">loading terrain…</div>
+  </div>
+  <div class="by"><img src="data/bedrock-watermark.png" alt="Powered by Bedrock"></div>
+</div>
+
+<script type="module">
+const $ = s => document.querySelector(s);
+// One definition of "phone" for the whole page: which data files are
+// fetched, how finely terrain is sampled, and whether rasters are
+// prefetched all key off it.
+const SMALL_SCREEN = matchMedia('(pointer: coarse)').matches || innerWidth < 900;
+const stat = (m, err) => { const s=$('#stat'); s.classList.toggle('err',!!err); $('#stat_p').textContent=m; };
+const fail = m => { $('#stat').classList.remove('gone'); stat(m,true); throw new Error(m); };
+
+/* ────────────────────────────────────────────────────────────────────────────
+   Exploration mode is the default here, not a fallback.
+
+   Williams has drilling, geochemistry, magnetics and IP, and no block model,
+   because no resource has been estimated. So this deck reports metres, grades
+   and intervals — and never a tonne, a grade-tonnage curve or an ounce. A
+   viewer that renders "0 t @ 0 g/t" for a project at this stage has made a
+   measurement claim where there is only an absence of one.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+const D = {};
+async function load(k, url) {
+  const r = await fetch(url);
+  if (!r.ok) fail(`${url} could not be read (${r.status}). Run williams/extract.py, rasters.py and claims.py first.`);
+  D[k] = await r.json();
+}
+
+// The data load moves BELOW the viewer — see computeDeck(). Nothing here
+// needs it yet.
+
+/* ---- palette ------------------------------------------------------------ */
+const GOLD = Cesium.Color.fromCssColorString('#C99A3A');
+const C = s => Cesium.Color.fromCssColorString(s);
+const ZONE = { 'GIC': '#3FC8DC', 'T-Bill': '#B99BFF' };
+// Every label that takes part in the screen-space solve. Declared here
+// because the layers that fill it are built long before the solver is.
+const LBL = [];        // {ent, base:Cartesian2, pri}
+
+// Text overrides live beside the camera locks and export together: a slide is
+// its framing AND its words, and splitting them across two mechanisms means
+// remembering to move both.
+const TXT_KEY = 'bedrock.williams.text';
+const TEXT_FIXED = {};
+let TXT_LOCK = {};
+try { TXT_LOCK = { ...TEXT_FIXED, ...JSON.parse(localStorage.getItem(TXT_KEY) || '{}') }; }
+catch { TXT_LOCK = { ...TEXT_FIXED }; }
+
+// Applied wherever a chapter's words are read, so the editor, the deck and the
+// text fallback all show the same thing.
+const chText = (i, field) => (TXT_LOCK[i] && TXT_LOCK[i][field] != null)
+  ? TXT_LOCK[i][field] : CH[i][field];
+
+const zoneC = z => C(ZONE[z] || '#9AA3A0');
+
+/* ---- the deck, as data --------------------------------------------------
+   Computed AFTER the graphics context exists but before anything is drawn, and
+   the order is the point on a phone: parsing 12 MB of JSON and THEN asking iOS
+   for a WebGL context asks at the worst possible moment, and what comes back is
+   a context Safari has already given up on. Requesting it while memory is still
+   free costs nothing on a desktop and may be what decides between a globe and a
+   fallback on a handset.
+
+   Nothing in here touches Cesium — which is what lets the text mode carry
+   exactly the same figures rather than a second, drifting copy of them. */
+let nf, ha, gr, dr, pl, p26, M, bestAu, km, dLon, dLat, cLon, FOOT, Z, DIST, CH;
+function computeDeck() {
+nf = n => n.toLocaleString('en-CA');
+gr = v => Number(v).toFixed(2);
+ha = n => Math.round(n).toLocaleString('en-CA');
+dr = D.drill.holes.filter(h => h.status === 'complete');
+pl = D.drill.holes.filter(h => h.status === 'planned');
+p26 = pl.filter(h => h.year === 2026);
+M = D.claims.meta;
+bestAu = D.drill.intercepts.find(i => i.el === 'Au');
+
+/* How much of the claim block has never been drilled. Measured off the collars
+   and the tenure boundary rather than stated, because "largely untested" is the
+   sort of line every exploration deck carries and none of them can show. */
+km = (a, b) => Math.abs(a - b) * 111320 * Math.cos(57.79 * Math.PI/180) / 1000;
+dLon = dr.map(h => h.collar[0]), dLat = dr.map(h => h.collar[1]);
+cLon = D.claims.features.filter(f => f.properties.role === 'subject')
+  .flatMap(f => (f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates))
+  .flat(2).map(p => p[0]);
+FOOT = {
+  w: km(Math.min(...dLon), Math.max(...dLon)),
+  h: Math.abs(Math.max(...dLat) - Math.min(...dLat)) * 111.32,
+  west: km(Math.min(...dLon), Math.min(...cLon)),
+  east: km(Math.max(...cLon), Math.max(...dLon)),
+};
+
+Z = Object.fromEntries(D.drill.zones.map(z => [z.name, z]));
+DIST = D.district.blocks;
+
+CH = [
+{ sec:'The district', ey:'Toodoggone Mining District, British Columbia',
+  t:'Who else is here',
+  b:'The Toodoggone hosts Centerra’s Kemess mine and a corridor of advanced gold projects — Thesis Gold’s Lawyers–Ranch, TDG’s Baker–Shasta, and the JOY district held by Amarc and Freeport. Omega Pacific holds the northern end of that corridor: 11,490 hectares, contiguous, 100% owned.',
+  layers:['district'], geo:null,
+  from:{ lon:-124.0, lat:54.0, alt:0, range:3600000, heading:0, pitch:-68 },
+  cam:{ lon:-127.09, lat:57.405, alt:1200, range:208000, heading:0, pitch:-50 },
+  fig:[[DIST.length+'','holders drawn'],
+       [nf(DIST.reduce((a,b)=>a+b.tenures,0)),'tenures'],
+       [nf(DIST.reduce((a,b)=>a+b.ha,0))+' ha','staked ground']] },
+
+{ sec:'The property', ey:'Mineral Titles Online, as of '+M.as_of.slice(0,10),
+  t:`${ha(M.subject_ha)} ha, eleven tenures`,
+  b:'Eleven contiguous mineral tenures totalling 11,490 hectares, 100% owned and in good standing to November 2034. The property sits 330 km north of Smithers and carries three distinct mineralising systems inside a single land package.',
+  layers:['claims'], geo:null, nameplate:true,
+  cam:{ lon:-127.767, lat:57.781, alt:1500, range:35000, heading:0, pitch:-60 },
+  fig:[[M.subject_tenures+'','tenures'],[ha(M.subject_ha)+' ha','held'],['2034-11-21','good to']] },
+
+{ sec:'The property', ey:'Two zones, two systems', t:'GIC and T-Bill',
+  b:'Two gold systems sit three kilometres apart inside the same claim block. GIC is broad, disseminated orogenic gold and the source of the property’s headline intercepts. T-Bill is a high-grade epithermal vein field, drilled hard in the 1980s and barely revisited since. Neither has been closed off in any direction.',
+  layers:['claims','zones','holes'], geo:null,
+  cam:{ lon:-127.7675, lat:57.7940, alt:1600, range:12200, heading:0, pitch:-54 },
+  fig:[[`${Z['GIC'].holes} / ${Z['T-Bill'].holes}`,'GIC / T-Bill holes'],
+       [`${nf(Z['GIC'].metres)} / ${nf(Z['T-Bill'].metres)} m`,'metres'],
+       ['3.0 km','between them']] },
+
+{ sec:'The evidence', ey:'Two surveys, 2020 and 2021 · reduced to pole',
+  t:'Magnetics over all eleven tenures',
+  b:'Airborne magnetics cover all eleven tenures. The magnetic lows map the alteration footprint of the systems, and the structures cutting them are the conduits the gold travelled. Both zones sit on the same regional break, and it continues across ground that has never been drilled.',
+  layers:['claims','zones'], geo:'mag',
+  cam:{ lon:-127.768, lat:57.797, alt:1500, range:23000, heading:0, pitch:-62 },
+  fig:[['2','surveys joined'],['11 / 11','tenures covered'],['5–10 m','grid cell']] },
+
+{ sec:'The evidence', ey:`${nf(D.soil.pts.length)} soil samples · 1973–2021`, t:'Gold in soil, to 15.2 g/t',
+  b:'4,503 soil samples spanning five decades. 219 of them run above 1.1 g/t gold and 24 above 5.2 g/t — grades normally reported from rock, not soil. The strongest anomalies sit directly over GIC and T-Bill, and both extend beyond the drilling.',
+  layers:['claims','zones','soil'], geo:null, legend:'soil',
+  cam:{ lon:-127.772, lat:57.789, alt:1500, range:13500, heading:0, pitch:-60 },
+  fig:[['219','samples ≥ 1.1 g/t'],['24','samples ≥ 5.2 g/t'],
+       [D.soil.breaks.au.max+' g/t','highest']] },
+
+{ sec:'The evidence', ey:`${nf(D.rock.pts.length)} rock samples`, t:'And in outcrop, to 110 g/t',
+  b:'1,023 rock samples, topping out at 110 g/t gold. Fifty-one exceed 1.75 g/t and twenty-one exceed 5.96. High-grade gold is exposed at surface across the property, including on ground no hole has ever tested.',
+  layers:['claims','zones','rock'], geo:null, legend:'rock',
+  cam:{ lon:-127.775, lat:57.792, alt:1550, range:9000, heading:0, pitch:-56 },
+  fig:[['51','samples ≥ 1.75 g/t'],['21','samples ≥ 5.96 g/t'],
+       [D.rock.breaks.au.max+' g/t','highest']] },
+
+{ sec:'The evidence', ey:'2021 ground DCIP · GIC only', t:'Chargeability under GIC',
+  b:'Ground induced polarisation defines a coherent chargeability high beneath GIC — the signature of disseminated sulphide, and the target every hole since 2021 has been drilled into. The survey covers 4.5 by 2.9 kilometres over GIC. No IP line has ever been run over T-Bill.',
+  layers:['claims','zones','holes'], geo:'ip_chg_50', zone:'GIC',
+  cam:{ lon:-127.7440, lat:57.8050, alt:1500, range:7600, heading:286, pitch:-25 },
+  fig:[['4.5 × 2.9 km','IP coverage'],['GIC','zone covered'],['0','lines over T-Bill']] },
+
+{ sec:'The evidence', ey:'50 m → 100 m depth slice', t:'The anomaly grows downward',
+  b:'The chargeability high broadens with depth rather than fading. WM22-02 entered 96.92 metres of 2.16 g/t gold at 250 m — below the deepest slice and still inside the anomaly. GIC is open down dip.',
+  layers:['claims','zones','holes','picks'], geo:'ip_chg_100', ground:.5, zone:'GIC', legend:'au',
+  cam:{ lon:-127.7548, lat:57.8065, alt:1450, range:3600, heading:300, pitch:-26 },
+  fig:[['100 m','slice depth'],['250 m','WM22-02 intercept top'],['open','down dip']] },
+
+{ sec:'What has been drilled', ey:'1983 → 2024 · seven campaigns',
+  t:`${dr.length} holes, ${nf(Math.round(dr.reduce((a,h)=>a+h.depth,0)))} metres`,
+  b:'Forty-five holes and 13,056 metres over four decades, drilled by successive operators and now held in one database. The modern holes are deep and fully assayed; the 1980s holes are shallow and were never followed up. 5,234 assayed intervals underpin everything in this presentation.',
+  layers:['claims','zones','holes','picks'], geo:null, ground:.46, legend:'au',
+  cam:{ lon:-127.7675, lat:57.7940, alt:1600, range:13600, heading:0, pitch:-46 },
+  fig:[[dr.length+'','holes drilled'],
+       [nf(Math.round(dr.reduce((a,h)=>a+h.depth,0)))+' m','metres'],
+       [nf(D.drill.holes.reduce((a,h)=>a+(h.assay?h.assay.length:0),0)),'assayed samples']] },
+
+{ sec:'What has been drilled', ey:'GIC · orogenic gold', t:bestAu.len+' m @ '+gr(bestAu.grade)+' g/t Au',
+  b:'WM22-02, from 250 metres: bulk-tonnage gold grade over nearly one hundred metres. WM24-01 returned 18.98 m of 6.22 g/t gold within the same system. Twelve holes have tested GIC across 4,026 metres, all of them since 2006, and the zone is open along strike and down dip.',
+  layers:['claims','holes','picks'], geo:null, ground:.34, zone:'GIC', legend:'au',
+  cam:{ lon:-127.7752, lat:57.8094, alt:1420, range:1550, heading:288, pitch:-17 },
+  fig:[[bestAu.len+' m','intercept'],[gr(bestAu.grade)+' g/t','gold'],
+       [Z['GIC'].holes+'','holes in GIC']] },
+
+{ sec:'What has been drilled', ey:'T-Bill · epithermal veins', t:'A different system, 3 km south',
+  b:`T-Bill is high-grade epithermal gold: 12.0 metres of 6.66 g/t in B83-2, and single intervals to 13.8 g/t. ${Z['T-Bill'].holes} holes and ${nf(Z['T-Bill'].metres)} metres, almost all of it from 1983 and 1984 and nothing since 2021. No IP survey has ever been flown over this zone.`,
+  layers:['claims','holes','picks'], geo:null, ground:.34, zone:'T-Bill', legend:'au',
+  cam:{ lon:-127.7712, lat:57.7818, alt:1780, range:2400, heading:298, pitch:-15 },
+  fig:[[Z['T-Bill'].holes+'','holes'],['12.0 m @ 6.66','B83-2, g/t Au'],
+       ['13.8 g/t','best single interval']] },
+
+{ sec:'What is next', ey:'Stage', t:'No resource has been estimated',
+  b:'Williams is an exploration-stage property and no mineral resource has been estimated. Nothing here states a tonnage, a grade-tonnage curve or an ounce count, because none has been established. What does exist: 13,056 metres of drilling, 5,526 geochemical samples, three geophysical surveys and eleven tenures — every figure traceable to its source.',
+  layers:['claims','zones','holes'], geo:null,
+  cam:{ lon:-127.767, lat:57.768, alt:1500, range:34500, heading:0, pitch:-48 },
+  fig:[['None','mineral resource'],['6','datasets'],[M.as_of.slice(0,10),'tenure as of']] },
+];
+}
+
+/* ---- text mode ----------------------------------------------------------
+   The deck without the globe, for a device that will not render one. Not an
+   apology screen: the same twelve chapters, the same figures, the same audit
+   trail, because all of it was computed from the data rather than read off the
+   scene. What is lost is the map — which is the part that needed WebGL — and
+   the page says so once, at the top, rather than in place of the content. */
+function textMode(probe, tried) {
+  document.querySelectorAll('.cesium-widget-errorPanel').forEach(e => e.remove());
+  const esc = t => String(t).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const secs = [];
+  let last = null;
+  for (const c of CH) {
+    if (c.sec !== last) { last = c.sec; secs.push(`<h3>${esc(c.sec)}</h3>`); }
+    // A still of what the globe would have drawn, captured at build time by
+    // williams/capture.mjs. `loading="lazy"` matters here: this is the device
+    // that could not afford a graphics context, and twelve images decoded at
+    // once is the same mistake in a different currency. If a still is missing
+    // the chapter still reads — alt text and the figures carry it.
+    const n = String(CH.indexOf(c) + 1).padStart(2, '0');
+    secs.push(
+      `<article><div class="ey">${esc(c.ey)}</div>` +
+      `<h2>${esc(c.t)}</h2>` +
+      `<img class="shot" loading="lazy" decoding="async" src="data/slides/${n}.jpg"` +
+      ` alt="${esc(c.t)}" onerror="this.remove()">` +
+      `<p>${esc(c.b)}</p>` +
+      (c.fig && c.fig.length
+        ? '<div class="fig">' + c.fig.map(([v, l]) =>
+            `<div><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('') + '</div>'
+        : '') + '</article>');
+  }
+  document.body.insertAdjacentHTML('beforeend', `<div id="txt"><div class="in">
+    <img src="data/omega-mark.png" alt="Omega Pacific Resources">
+    <div class="w">Omega Pacific Resources</div>
+    <h1>Williams</h1>
+    <div class="s">Toodoggone District, British Columbia</div>
+    <button id="retry3d">Try the live map again</button>
+    <div class="warn"><b>Showing rendered views instead of the live map.</b> This browser would not
+      give the page a 3D graphics context, so the map cannot be flown — the
+      views below are stills of it, and every figure is unaffected because all
+      of them are computed from the data rather than read off the scene. On
+      iPhone the usual cause is other Safari tabs, which share a small pool of
+      graphics contexts: close a few and reload. Lockdown Mode disables WebGL
+      outright.</div>
+    ${secs.join('')}
+    <h3>Sources</h3><div id="txt_src"></div>
+    <div class="foot"><img src="data/bedrock-watermark.png" alt="Powered by Bedrock">
+      <div class="diag">${esc(probe)} · ${esc((tried || []).join(' | '))}</div></div>
+  </div></div>`);
+  document.getElementById('txt_src').innerHTML = sourcesHTML();
+  /* Closing tabs frees graphics contexts, and the advice above is useless if
+     acting on it costs a full reload — 16 MB and a cold start on the device
+     least able to afford either. The retry re-runs the ladder in place, with
+     everything already parsed. */
+  document.getElementById('retry3d').onclick = () => location.replace(
+    location.pathname + '?r=' + Date.now());
+  const st = document.getElementById('stat'); if (st) st.style.display = 'none';
+  for (const id of ['brand','rail','panel','layers','right','mark','stage','scrimL','scrimR','scrimB','legend','zkey'])
+    { const e = document.getElementById(id); if (e) e.style.display = 'none'; }
+}
+
+/* ---- viewer ------------------------------------------------------------- */
+stat('loading terrain…');
+let imagery, terrain;
+const timeout = (p, ms, what) => Promise.race([p,
+  new Promise((_,x)=>setTimeout(()=>x(new Error(what+' timed out')), ms))]);
+try {
+  imagery = await timeout(Cesium.ArcGisMapServerImageryProvider.fromUrl(
+    'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer'), 15000, 'satellite imagery');
+} catch { imagery = new Cesium.UrlTemplateImageryProvider({
+    url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png', maximumLevel:19, credit:'© OpenStreetMap'}); }
+try {
+  terrain = await timeout(Cesium.ArcGISTiledElevationTerrainProvider.fromUrl(
+    'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer'), 15000, 'terrain');
+} catch {
+  // Flat ground is survivable and silent flat ground is not: at Williams the
+  // collars span 510 m of relief and the deck is about a hillside.
+  terrain = new Cesium.EllipsoidTerrainProvider();
+  document.querySelector('#stage span').textContent = 'Exploration stage · flat ground';
+}
+
+/* Getting a WebGL context on an iPhone is not a given, and the ways it fails
+   are specific rather than general:
+
+     * `powerPreference:'high-performance'` asks iOS for the discrete path on a
+       device that has none, and some builds of Safari answer by refusing the
+       context outright rather than by ignoring the hint;
+     * an iPhone's devicePixelRatio is 3, so a full-resolution drawing buffer is
+       NINE times the pixels of a CSS-sized one, and the allocation is what
+       fails when memory is tight;
+     * WebGL2 is not always granted where WebGL1 is.
+
+   So the context is requested three times, each attempt asking for less, and
+   the buffer is capped on any coarse-pointer device afterwards. If all three
+   fail the page says so in its own words — Cesium's default dialog tells a
+   mining executive to update their video drivers. */
+/* What the DEVICE can do, asked before Cesium is involved.
+   Without this, a failure is only ever "Cesium could not start", which does not
+   distinguish a browser with WebGL switched off — iOS Lockdown Mode disables it
+   outright — from a browser that has it and would not give Cesium one.
+
+   The probe releases its contexts through WEBGL_lose_context. A probe that
+   leaks is worse than no probe: on iOS the context it is holding is the one the
+   real viewer then cannot have, so the diagnostic causes the failure it is
+   there to explain. */
+function probeWebGL() {
+  /* "Did getContext return an object" is the wrong question, and answering it
+     is what sent the last two fixes down the wrong road. Safari hands back a
+     context object it has already given up on — `getContext` succeeds, and then
+     every `getParameter` returns null. Cesium's Context constructor reads
+     `getParameter(MAX_VIEWPORT_DIMS)[0]` early, so a dead context surfaces as
+     "null is not an object (evaluating 'u[0]')" — a message about a WebGL
+     parameter wearing the costume of a missing graphics stack.
+
+     So the probe asks the same question Cesium does: not whether a context
+     exists, but whether it answers. */
+  const out = [];
+  for (const kind of ['webgl2', 'webgl']) {
+    let c = null, gl = null;
+    try {
+      c = document.createElement('canvas'); c.width = c.height = 2;
+      gl = c.getContext(kind, { failIfMajorPerformanceCaveat: false });
+      if (!gl) { out.push(kind + ': none'); continue; }
+      const dims = gl.getParameter(gl.MAX_VIEWPORT_DIMS);
+      const lost = gl.isContextLost();
+      out.push(kind + ': ' + (lost ? 'LOST on creation'
+        : !dims ? 'DEAD (parameters return null)'
+        : 'live ' + dims[0] + 'x' + dims[1]));
+    } catch (e) {
+      out.push(kind + ': threw ' + ((e && e.message) || e));
+    } finally {
+      try { gl && gl.getExtension('WEBGL_lose_context')?.loseContext(); } catch {}
+      c = gl = null;
+    }
+  }
+  return out.join(', ');
+}
+
+/* What a Viewer allocates before it draws anything, and what a phone can do
+   without. Each of these is a framebuffer or a texture set that exists to make
+   a desktop scene nicer:
+
+     scene3DOnly                  — skips the 2D and Columbus-view resources,
+                                    which this deck never enters;
+     orderIndependentTranslucency — several full-screen framebuffers, and the
+                                    single biggest allocation in the list;
+     msaaSamples 1                — no multisample buffer;
+     skyBox / sun / moon          — cube map and two textures, invisible at the
+                                    ranges this deck uses;
+     requestRenderMode            — already on: no continuous redraw.
+
+   Desktop keeps all of it. The point is not to make the phone's picture worse
+   than it needs to be, it is that the allocations most likely to be refused are
+   the ones buying the least here. */
+const LEAN = SMALL_SCREEN ? {
+  scene3DOnly: true, orderIndependentTranslucency: false, msaaSamples: 1,
+  skyBox: false, sun: false, moon: false, shadows: false,
+  terrainShadows: Cesium.ShadowMode.DISABLED,
+} : {};
+
+/* The driver's own explanation. When a browser refuses a WebGL context it
+   fires `webglcontextcreationerror` on the canvas with a `statusMessage` saying
+   why — and that string is the one piece of evidence this investigation has
+   never had, because Cesium creates the canvas itself and swallows the event.
+   Captured at the document level, so it is caught wherever the canvas lives. */
+let ctxReason = '';
+document.addEventListener('webglcontextcreationerror',
+  e => { ctxReason = e.statusMessage || '(no message)'; }, true);
+
+const ATTEMPTS = [
+  { label: 'webgl2 · high-performance',
+    o: { webgl: { powerPreference: 'high-performance' } } },
+  { label: 'webgl2 · default power',
+    o: { webgl: { powerPreference: 'default', antialias: false, alpha: false,
+                  stencil: false, failIfMajorPerformanceCaveat: false } } },
+  // `requestWebgl1` — NOT `requestWebgl2:false`, which Cesium does not read, so
+  // this rung was a duplicate of the one above it and WebGL1 was never tried.
+  // A pause before the last two. iOS refuses contexts under transient memory
+  // pressure, and three attempts inside one millisecond all meet the same
+  // moment — the retry is only a retry if something has had a chance to change.
+  { label: 'webgl2 · after 600 ms', wait: 600,
+    o: { webgl: { powerPreference: 'default', antialias: false, alpha: false,
+                  stencil: false, depth: true, failIfMajorPerformanceCaveat: false } } },
+  { label: 'webgl1 · lean', wait: 900,
+    o: { requestWebgl1: true, webgl: { powerPreference: 'low-power', antialias: false,
+                                       alpha: false, stencil: false,
+                                       preserveDrawingBuffer: false,
+                                       failIfMajorPerformanceCaveat: false } } },
+];
+
+/* Each attempt gets its OWN ImageryLayer and its own container element.
+   The first version shared one layer across all three, and a Viewer that fails
+   to construct still destroys what it was handed — so attempts two and three
+   were given a destroyed layer and died with "null is not an object", which is
+   a message about our retry loop wearing the costume of a graphics failure.
+   Reusing the DOM node has the same shape of problem: the abandoned canvas
+   still holds the context the next attempt is asking for. */
+let viewer = null, ctxUsed = '';
+const tried = [];
+// ?ctxfail=N forces the first N attempts to throw. The fallback path is the one
+// that only runs on hardware we do not have, so it needs a way to be run here —
+// the shared-layer bug survived precisely because the ladder had never once
+// been walked past its first rung.
+const FORCE_FAIL = +(new URLSearchParams(location.search).get('ctxfail') || 0);
+let attempt = 0;
+for (const a of ATTEMPTS) {
+  if (a.wait) { stat('the graphics chip is busy — retrying…');
+                await new Promise(r => setTimeout(r, a.wait)); }
+  const host = document.getElementById('cesiumContainer');
+  const fresh = document.createElement('div');
+  fresh.id = 'cesiumContainer';
+  host.replaceWith(fresh);
+  try {
+    if (attempt++ < FORCE_FAIL) throw new Error('forced failure for testing');
+    viewer = new Cesium.Viewer(fresh, {
+      baseLayer: new Cesium.ImageryLayer(imagery), terrainProvider: terrain,
+      animation:false, timeline:false, geocoder:false, homeButton:false, sceneModePicker:false,
+      baseLayerPicker:false, navigationHelpButton:false, fullscreenButton:false, infoBox:false,
+      selectionIndicator:false, requestRenderMode:true, maximumRenderTimeChange:Infinity,
+      // Cesium paints its own error panel into the container on failure, over
+      // the top of ours, and it tells a mining executive to update their video
+      // drivers. We do the messaging.
+      showRenderLoopErrors:false,
+      ...LEAN,
+      contextOptions: a.o,
+    });
+    ctxUsed = a.label; break;
+  } catch (e) {
+    const st = ((e && e.stack) || '').split('\n')[1] || '';
+    tried.push(`${a.label}: ${(e && e.message) || e}` +
+               (ctxReason ? ` [driver: ${ctxReason}]` : '') +
+               (st ? ' @' + st.trim().slice(0, 60) : ''));
+  }
+}
+if (!viewer) {
+  // The fallback needs the numbers, and the whole reason the context was asked
+  // for first is that the numbers had not been loaded yet.
+  await Promise.all([
+    load('drill',  'data/drilling.json'),
+    load('soil',   SMALL_SCREEN ? 'data/geochem_soil.m.json' : 'data/geochem_soil.json'),
+    load('rock',   SMALL_SCREEN ? 'data/geochem_rock.m.json' : 'data/geochem_rock.json'),
+    load('claims', 'data/claims.geojson'),
+    load('geo',    'data/geophysics.json'),
+    load('district','data/district.json'),
+    load('logos',  'data/logos.json'),
+  ]);
+  computeDeck();
+  let probe = '(probe failed)';
+  try { probe = probeWebGL(); } catch (e) { probe = 'probe threw: ' + ((e && e.message) || e); }
+  try { textMode(probe.replace(/$/, ctxReason ? ' · driver said: ' + ctxReason : ''), tried); }
+  catch (e) {
+    // Last resort. A fallback that throws leaves a black screen saying nothing,
+    // which is worse than the error it was written to replace.
+    document.querySelectorAll('.cesium-widget-errorPanel').forEach(el => el.remove());
+    fail('This browser would not render the 3D view, and the text version could ' +
+         'not be built either. ' + probe + ' · ' + tried.join(' | ') +
+         ' · text mode: ' + ((e && e.message) || e));
+  }
+  throw new Error('no webgl context');
+}
+
+stat('reading the data room…');
+await Promise.all([
+  load('drill',  'data/drilling.json'),
+  load('soil',   SMALL_SCREEN ? 'data/geochem_soil.m.json' : 'data/geochem_soil.json'),
+  load('rock',   SMALL_SCREEN ? 'data/geochem_rock.m.json' : 'data/geochem_rock.json'),
+  load('claims', 'data/claims.geojson'),
+  load('geo',    'data/geophysics.json'),
+  load('district','data/district.json'),
+  load('logos',  'data/logos.json'),
+]);
+computeDeck();
+
+const scene = viewer.scene;
+/* Scene-level allocations a phone can do without. Terrain tiles are the largest
+   ongoing cost after the drawing buffer, and screen-space error is the dial
+   that governs how many are resident: 3 rather than the default 2 is roughly
+   half the tiles for a difference invisible at arm's length. The atmosphere and
+   fog are extra passes buying nothing at these ranges. */
+if (SMALL_SCREEN) {
+  scene.globe.maximumScreenSpaceError = 3;
+  scene.globe.tileCacheSize = 60;
+  scene.skyAtmosphere.show = false;
+  scene.globe.showGroundAtmosphere = false;
+  scene.fog.enabled = false;
+}
+// Cesium's `useBrowserRecommendedResolution` defaults to true, which already
+// renders at CSS resolution and ignores the iPhone's 3x — so the drawing buffer
+// is 390x844, not 1170x2532. Applying a resolutionScale on top of that halved
+// it again to 195x422 and just made the deck blurry for no memory saved. Left
+// at the default deliberately; the note is here so it does not get "fixed"
+// twice.
+viewer.useBrowserRecommendedResolution = true;
+const DPR = window.devicePixelRatio || 1;
+scene.globe.depthTestAgainstTerrain = true;
+/* Every hole on this property is underground, which sounds obvious and is the
+   whole rendering problem: with opaque terrain and depth testing on, a correct
+   drill forest is a field of dots. The ground has to become translucent for the
+   drilling chapters, and the terrain GEOMETRY stays — collars still sit on the
+   real surface and the traces still pass through the real hillside. */
+scene.globe.translucency.enabled = true;
+/* Confined to the property. Translucency applied to the whole globe makes the
+   far side of the Earth visible through the hillside — the first version of
+   this drew the Mediterranean under the GIC drill fan. Outside this rectangle
+   the ground stays solid, which is also what a viewer expects: the hole you
+   are looking into is see-through, the mountains behind it are not. */
+/* Generously larger than the claim block. The rectangle's edge is a hard seam
+   between translucent ground and solid ground, and a box drawn tight to the
+   property put that seam through the middle of every property-scale shot. The
+   chapters that turn translucency on are all framed inside 8 km, so a 45 km
+   box keeps the edge off screen. */
+scene.globe.translucency.rectangle = Cesium.Rectangle.fromDegrees(-128.15, 57.58, -127.38, 58.00);
+scene.globe.translucency.backFaceAlpha = 0;   // the far side of the planet is
+                                              // not what "see into the hill" means
+scene.globe.undergroundColor = C('#0A0D0F');
+scene.globe.undergroundColorAlphaByDistance = new Cesium.NearFarScalar(600, .62, 3e4, .78);
+function ground(a) {
+  // Off, not "on at alpha 1". Translucency enabled with a full-opacity front
+  // face still composites through undergroundColor and still draws the
+  // rectangle's edge, so every chapter that does not need to see underground
+  // was paying for a seam it had no use for.
+  scene.globe.translucency.enabled = a < 0.98;
+  scene.globe.translucency.frontFaceAlpha = a;
+  // Depth testing against a surface you can see through hides the very thing
+  // the translucency was turned on to reveal.
+  scene.globe.depthTestAgainstTerrain = a > 0.92;
+  const el = document.querySelector('#gnd'); if (el) el.value = Math.round(a * 100);
+  render();
+}
+scene.globe.enableLighting = false;
+if (!SMALL_SCREEN) { scene.fog.enabled = true; scene.skyAtmosphere.show = true; }
+scene.screenSpaceCameraController.enableCollisionDetection = true;
+const render = () => scene.requestRender();
+window.viewer = viewer; window.__D = D;   // debugging + console access during a live present
+
+/* Discrete grade tiers, not a continuous ramp. Two thirds of the assay table
+   sits under 0.3 g/t; interpolating smoothly across it renders as fog, whereas
+   stepped bands read as structure. */
+const AU_TIERS = [
+  { min: 5.0,  c:'#F4E3B0', label:'≥ 5 g/t'   },
+  { min: 2.0,  c:'#E8B84B', label:'2 – 5'     },
+  { min: 1.0,  c:'#C9762A', label:'1 – 2'     },
+  { min: 0.5,  c:'#8E4A2E', label:'0.5 – 1'   },
+  { min: 0.1,  c:'#4A3A38', label:'0.1 – 0.5' },
+];
+const auColor = v => { for (const t of AU_TIERS) if (v >= t.min) return C(t.c); return null; };
+
+/* ---- geometry helpers --------------------------------------------------- */
+const cart = (lon, lat, h) => Cesium.Cartesian3.fromDegrees(lon, lat, h);
+const holePath = h => h.path.map(p => cart(p[0], p[1], p[2]));
+
+/* Depth along the hole is measured along the desurveyed trace, not down the
+   collar azimuth. On WM22-02 the difference over 500 m is tens of metres, and
+   an intercept bar hung at the wrong depth is a claim about where the gold is. */
+function cumulative(pts) {
+  const d = [0];
+  for (let i = 1; i < pts.length; i++)
+    d.push(d[i-1] + Cesium.Cartesian3.distance(pts[i-1], pts[i]));
+  return d;
+}
+function atDepth(pts, cum, depth) {
+  const total = cum[cum.length-1];
+  const t = Math.max(0, Math.min(depth, total));
+  let i = 1; while (i < cum.length-1 && cum[i] < t) i++;
+  const span = cum[i] - cum[i-1] || 1;
+  return Cesium.Cartesian3.lerp(pts[i-1], pts[i], (t - cum[i-1]) / span, new Cesium.Cartesian3());
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   LAYERS
+   Each is built once and toggled, because a chapter change that rebuilds 4,500
+   geochem points drops a frame exactly when the camera is moving.
+   ──────────────────────────────────────────────────────────────────────────── */
+const L = {};
+const prims = () => scene.primitives.add(new Cesium.PrimitiveCollection());
+
+/* Set once the district layout has been solved at the opening frame. */
+let freezeDistrict = () => {};
+
+/* ---- the district ------------------------------------------------------- */
+/* Consolidated by registered holder: every parcel one holder owns is filled in
+   one colour with no internal outlines, so the ground reads as a block rather
+   than as a filing history. Deliberately NOT dissolved into a single polygon —
+   a dissolve draws an outer boundary the register never issued.
+
+   Labels are laid out in SCREEN space, every frame, and this is the part worth
+   reading. Spacing them in degrees only works at the zoom it was tuned for:
+   the same 25 km of ground is 300 px at 60 km and 40 px at 400 km, so a map
+   tuned at one range piles up at another — and the pile is worst on the
+   district slide, the one people zoom on. Nor is culling the answer, because a
+   missing neighbour on a neighbours map is the one outcome that costs
+   something.
+
+   So each label is anchored to a real point on its holder's ground, projected
+   to the screen, and MOVED — in pixels, by a spiral search — until its
+   rectangle is free. The chosen pixel is unprojected back onto the globe and
+   becomes the label's position, with a leader drawn to the anchor whenever it
+   had to travel. Priority is holding size with the subject pinned on top, so
+   the block the deck is about never gives way to a neighbour. */
+{
+  const ds = new Cesium.CustomDataSource('district');
+  const HUE = ['#4E7FA8','#8A5F9E','#4F8F72','#A8663E','#5E6C8C','#7E8A4A',
+               '#9E5568','#4A8A96','#8A7A45','#6B5E8F','#3F7A5E','#96604E',
+               '#5A7C9E','#7A5A7A','#4F8A80'];
+  const lum = hex => {
+    const v = parseInt(hex.slice(1), 16);
+    return (.2126*(v>>16 & 255) + .7152*(v>>8 & 255) + .0722*(v & 255)) / 255;
+  };
+
+  const drawn = D.district.blocks.filter(b =>
+    b.subject || (b.logo !== false && D.logos[b.holder]) || b.project);
+
+  const byHolder = new Map();
+  const items = [];
+  let n = 0;
+  for (const b of D.district.blocks) {
+    if (!byHolder.has(b.holder)) byHolder.set(b.holder, HUE[n++ % HUE.length]);
+    const hex = b.subject ? '#C99A3A' : byHolder.get(b.holder);
+    const col = C(hex);
+
+    for (const ring of b.rings) {
+      const pos = Cesium.Cartesian3.fromDegreesArray(ring.flat());
+      ds.entities.add({ polygon: {
+        hierarchy: new Cesium.PolygonHierarchy(pos),
+        material: col.withAlpha(b.subject ? .72 : .58),
+        classificationType: Cesium.ClassificationType.TERRAIN }});
+    }
+    // Only the subject is outlined. The dissolved boundary was correct and
+    // still wrong to draw fourteen times over.
+    if (b.subject) for (const seg of (b.outline || [])) {
+      ds.entities.add({ polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray(seg.flat()),
+        clampToGround: true, width: 3, material: GOLD }});
+    }
+    if (!drawn.includes(b)) continue;
+
+    const at = b.anchor_at || b.label_at;
+    const anchor = cart(at[0], at[1], 0);
+    const lg = b.logo === false ? null : D.logos[b.holder];
+    const item = { anchor, ents: [], pri: b.subject ? 1e9 : b.ha, hex };
+
+    if (lg) {
+      const LH = b.subject ? 76 : 54;
+      item.w = Math.round(lg.w * LH / lg.h); item.top = LH + 40; item.bot = 8;
+      item.ents.push(ds.entities.add({ position: anchor, billboard: {
+        image: lg.file, height: LH, width: item.w,
+        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        disableDepthTestDistance: Number.POSITIVE_INFINITY }}));
+    } else {
+      item.w = 120; item.top = 46; item.bot = 8;
+    }
+
+    const name = b.operator || b.holder.replace(/\s+(INC|LTD|CORP|CORPORATION)\.?$/i, '');
+    const text = lg ? (b.project ? b.project.toUpperCase() : null)
+                    : (b.project ? `${b.project.toUpperCase()}\n${name}` : name.toUpperCase());
+    if (text) {
+      const big = b.subject;
+      item.w = Math.max(item.w, text.split('\n')[0].length * (big ? 14 : 9) + 26);
+      if (!lg) item.top = 46;
+      item.ents.push(ds.entities.add({ position: anchor, label: {
+        text,
+        font: big ? '700 24px Archivo, sans-serif' : '600 15px Archivo, sans-serif',
+        fillColor: lum(hex) > .46 ? C('#0A0D0F') : C('#F6F7F4'),
+        showBackground: true, backgroundColor: col.withAlpha(.96),
+        backgroundPadding: big ? new Cesium.Cartesian2(17,11) : new Cesium.Cartesian2(12,8),
+        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+        verticalOrigin: lg ? Cesium.VerticalOrigin.TOP : Cesium.VerticalOrigin.BOTTOM,
+        pixelOffset: new Cesium.Cartesian2(0, lg ? 6 : 0),
+        disableDepthTestDistance: Number.POSITIVE_INFINITY }}));
+    }
+
+    item.leader = ds.entities.add({ polyline: {
+      positions: [anchor, anchor], clampToGround: true,
+      width: 1.6, material: col.withAlpha(.9), show: false }});
+    items.push(item);
+  }
+
+  const C2 = Cesium.Cartesian2;
+  /* Solved once, at the opening frame, and then frozen.
+     The per-frame version was correct at every zoom and unsettling to watch:
+     labels slid and leaders grew as the camera moved, so the map never looked
+     finished and a presenter could not point at anything. A district map is
+     read, not explored — one good solve and a fixed answer is worth more than
+     a continuously optimal one. The solver is unchanged; only how often it
+     runs. */
+  let frozen = false, revealed = false;
+  // The marks are held back through the whole descent. A logo drifting across
+  // the Pacific at 3,000 km is a sticker on a globe; the same logo appearing
+  // once the camera has settled on the belt is a place. Nothing is drawn until
+  // the layout is solved and fixed, and then it is animated in.
+  const apply = it => { for (const e of it.ents) e.show = revealed && it.visible; };
+  freezeDistrict = () => { frozen = true; popIn(); };
+  const layout = () => {
+    if (!ds.show || frozen) return;
+    const w = scene.canvas.clientWidth, h = scene.canvas.clientHeight;
+    const taken = [];
+    for (const it of [...items].sort((a, b) => b.pri - a.pri)) {
+      const a = Cesium.SceneTransforms.worldToWindowCoordinates(scene, it.anchor);
+      if (!a) { it.visible = false; apply(it); it.leader.show = false; continue; }
+      const rect = (x, y) => ({ x0: x - it.w/2, x1: x + it.w/2, y0: y - it.top, y1: y + it.bot });
+      const free = r => r.x1 > 0 && r.x0 < w && r.y1 > 0 && r.y0 < h &&
+        taken.every(q => r.x0 > q.x1 || r.x1 < q.x0 || r.y0 > q.y1 || r.y1 < q.y0);
+
+      let px = null;
+      if (free(rect(a.x, a.y))) px = { x: a.x, y: a.y };
+      else outer: for (let ring = 1; ring <= 6; ring++)
+        for (let k = 0; k < 12; k++) {
+          const th = (k / 12) * 2 * Math.PI + (ring % 2) * Math.PI / 12;
+          const rad = 40 + ring * Math.max(28, it.top * .55);
+          const x = a.x + rad * Math.cos(th), y = a.y - rad * Math.sin(th) * .8;
+          if (free(rect(x, y))) { px = { x, y }; break outer; }
+        }
+      if (!px) { it.visible = false; apply(it); it.leader.show = false; continue; }
+
+      taken.push(rect(px.x, px.y));
+      const moved = Math.hypot(px.x - a.x, px.y - a.y);
+      let pos = it.anchor;
+      if (moved > 2) {
+        const p = scene.camera.pickEllipsoid(new C2(px.x, px.y), scene.globe.ellipsoid);
+        if (p) pos = p;
+      }
+      it.visible = true;
+      for (const e of it.ents) e.position = pos;
+      apply(it);
+      it.leaderWanted = moved > 26;
+      it.leader.show = revealed && it.leaderWanted;
+      if (it.leaderWanted) it.leader.polyline.positions = [it.anchor, pos];
+    }
+  };
+  /* Staggered reveal, biggest holder first. Ease-out with a small overshoot —
+     the overshoot is what reads as "placed" rather than "faded up", and 420 ms
+     is long enough to see and short enough not to be waited on. */
+  function popIn() {
+    if (revealed) return;
+    revealed = true;
+    const order = [...items].sort((a, b) => b.pri - a.pri);
+    const t0 = performance.now(), DUR = 420, STAG = 95;
+    const tick = () => {
+      const now = performance.now();
+      let running = false;
+      order.forEach((it, i) => {
+        const t = (now - t0 - i * STAG) / DUR;
+        if (t < 1) running = true;
+        if (t <= 0) { for (const e of it.ents) e.show = false; return; }
+        const k = 1 - Math.pow(1 - Math.min(1, t), 3);
+        const scale = t >= 1 ? 1 : 0.55 + 0.53 * k - 0.08 * k * k;
+        for (const e of it.ents) {
+          e.show = it.visible;
+          if (e.billboard) e.billboard.scale = scale;
+          if (e.label) e.label.scale = scale;
+        }
+        it.leader.show = it.visible && it.leaderWanted && t >= 0.75;
+      });
+      render();
+      if (running) requestAnimationFrame(tick);
+    };
+    tick();
+  }
+  scene.preRender.addEventListener(layout);
+
+  viewer.dataSources.add(ds); ds.show = false; L.district = ds;
+}
+
+/* ---- claims ------------------------------------------------------------- */
+/* The property itself, parcel by parcel. Neighbours are NOT drawn here — they
+   are the district layer's job, consolidated and named. Drawn at this zoom they
+   were one prospector's two claims wedged into the middle of the block,
+   labelled with his name, competing with the thing the slide is about. */
+{
+  const ds = new Cesium.CustomDataSource('claims');
+  const rings = g => g.type === 'Polygon' ? g.coordinates : g.coordinates.flatMap(p => p);
+  for (const f of D.claims.features) {
+    for (const ring of rings(f.geometry)) {
+      ds.entities.add({ polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray(ring.flat()),
+        width: 3, clampToGround: true, material: GOLD }});
+    }
+    ds.entities.add({ polygon: {
+      hierarchy: new Cesium.PolygonHierarchy(
+        Cesium.Cartesian3.fromDegreesArray(rings(f.geometry)[0].flat())),
+      material: GOLD.withAlpha(.09), classificationType: Cesium.ClassificationType.TERRAIN }});
+  }
+  // The property needs naming on its own slide: the district layer is off here,
+  // so without this the claim block is an unlabelled gold outline.
+  const plate = [];
+  const P = D.claims.features.flatMap(f => rings(f.geometry)).flat();
+  const lon = P.reduce((a, p) => a + p[0], 0) / P.length;
+  const lat = P.reduce((a, p) => a + p[1], 0) / P.length;
+  plate.push(ds.entities.add({ position: cart(lon, lat, 0), label: {
+    text: 'WILLIAMS', font: '700 26px Archivo, sans-serif',
+    pixelOffset: new Cesium.Cartesian2(0,-6),
+    fillColor: C('#12100B'), showBackground: true, backgroundColor: GOLD.withAlpha(.97),
+    backgroundPadding: new Cesium.Cartesian2(18,12),
+    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+    disableDepthTestDistance: Number.POSITIVE_INFINITY,
+    scaleByDistance: new Cesium.NearFarScalar(6e3, 1.1, 6e4, .8),
+    translucencyByDistance: new Cesium.NearFarScalar(9e4, 1, 9.4e4, 0) }}));
+  plate.push(ds.entities.add({ position: cart(lon, lat, 0), label: {
+    text: `${Math.round(D.claims.meta.subject_ha).toLocaleString('en-CA')} ha`
+        + ` · ${D.claims.meta.subject_tenures} tenures · 100% owned`,
+    font: '500 12.5px "JetBrains Mono", monospace', fillColor: C('#EDEEEC'),
+    showBackground: true, backgroundColor: C('rgba(7,9,10,.9)'),
+    backgroundPadding: new Cesium.Cartesian2(10,6),
+    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+    verticalOrigin: Cesium.VerticalOrigin.TOP,
+    pixelOffset: new Cesium.Cartesian2(0, 9),
+    disableDepthTestDistance: Number.POSITIVE_INFINITY,
+    scaleByDistance: new Cesium.NearFarScalar(6e3, 1.1, 6e4, .8),
+    translucencyByDistance: new Cesium.NearFarScalar(6e4, 1, 6.4e4, 0) }}));
+
+  viewer.dataSources.add(ds); ds.show = false;
+  L.claims = { get show() { return ds.show; }, set show(v) { ds.show = v; },
+               nameplate: on => plate.forEach(e => e.show = on) };
+}
+
+/* ---- zones -------------------------------------------------------------- */
+/* GIC north, T-Bill south. The ring is the convex hull of that zone's drilled
+   collars pushed out 300 m — the extent of DRILLING, and the label says so.
+   Nobody has mapped a contact here, and a ring built from collar positions
+   presented as geology would be a claim about where the rock changes. */
+{
+  const ds = new Cesium.CustomDataSource('zones');
+  const zlabels = [], zfills = [];
+  for (const z of D.drill.zones) {
+    const col = zoneC(z.name);
+    ds.entities.add({ polyline: {
+      positions: Cesium.Cartesian3.fromDegreesArray(z.ring.flat()),
+      width: 2.6, clampToGround: true, material: col }});
+    zfills.push(ds.entities.add({ polygon: {
+      hierarchy: new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArray(z.ring.flat())),
+      material: col.withAlpha(.13), classificationType: Cesium.ClassificationType.TERRAIN }}));
+    // Two labels, not one: a Cesium label has a single font, so a big zone
+    // name and a small stats line have to be separate entities. The name is
+    // the thing a reader needs from across the property; the counts are the
+    // thing they want once they have found it.
+    const lab = ds.entities.add({ position: cart(z.centre[0], z.centre[1], 0), label: {
+      text: z.name,
+      font: '700 30px Archivo, sans-serif', fillColor: C('#08090A'),
+      showBackground: true, backgroundColor: col.withAlpha(.97),
+      backgroundPadding: new Cesium.Cartesian2(20,13),
+      heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+      verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+      pixelOffset: new Cesium.Cartesian2(0,-16),
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+      scaleByDistance: new Cesium.NearFarScalar(4e3, 1.1, 5e4, 1),
+      translucencyByDistance: new Cesium.NearFarScalar(5e4, 1, 5.6e4, 0) }});
+    const sub = ds.entities.add({ position: cart(z.centre[0], z.centre[1], 0), label: {
+      text: `${z.holes} holes · ${z.metres.toLocaleString('en-CA')} m · ${z.years}`,
+      font: '500 12.5px "JetBrains Mono", monospace', fillColor: C('#EDEEEC'),
+      showBackground: true, backgroundColor: C('rgba(7,9,10,.9)'),
+      backgroundPadding: new Cesium.Cartesian2(10,6),
+      heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+      verticalOrigin: Cesium.VerticalOrigin.TOP,
+      pixelOffset: new Cesium.Cartesian2(0, 7),
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+      scaleByDistance: new Cesium.NearFarScalar(4e3, 1.1, 5e4, 1),
+      translucencyByDistance: new Cesium.NearFarScalar(3.4e4, 1, 4e4, 0) }});
+    sub.__zone = z.name; zlabels.push(sub);
+    const off = e => (e.label.pixelOffset && e.label.pixelOffset.getValue())
+                     || new Cesium.Cartesian2(0, 0);
+    const midLat = D.drill.zones.reduce((a, q) => a + q.centre[1], 0) / D.drill.zones.length;
+    const bias = z.centre[1] >= midLat ? 1 : -1;
+    LBL.push({ ent: lab, base: off(lab), pri: 900, bias });
+    LBL.push({ ent: sub, base: off(sub), pri: 800, bias });
+    zlabels.push(lab);
+  }
+  viewer.dataSources.add(ds); ds.show = false;
+  L.zones = { get show() { return ds.show; },
+              set show(v) { ds.show = v; },
+              labels: (on, only) => zlabels.forEach(e =>
+                e.label.show = on && (!only || e.__zone === only)),
+              // A tinted zone fill over a chargeability raster changes the
+              // colour of the anomaly it is supposed to be framing.
+              fill:   on => zfills.forEach(e => e.polygon.show = on) };
+}
+
+/* ---- geochemistry ------------------------------------------------------- */
+/* Percentile breaks, computed per element over this survey and carried in the
+   data. A soil grid is lognormal: one 15.2 g/t sample on a linear ramp renders
+   every other point as background and the anomaly disappears into the map.
+
+   Elevation is the problem these points actually have. Four fifths of them
+   carry no recorded z — the assessment reports plotted them on a map and never
+   surveyed a height — so every sample is draped on the public DEM and none use
+   the recorded value, because mixing surveyed and interpolated elevations in
+   one layer produces a surface that is neither. The first version placed them
+   at 4 m absolute, which is 1,500 m beneath the ground here, and the entire
+   layer rendered inside the mountain. */
+const PCT = ['#3C4A52','#5E7A6B','#9BA84E','#D9A03C','#D2662C','#C0342B'];
+async function drape(pts) {
+  const cg = pts.map(p => Cesium.Cartographic.fromDegrees(p[0], p[1]));
+  // Level 13 is 5,526 samples across a lot of tiles; a phone on cellular
+  // spends the whole opening flight fetching them. 11 is four times fewer
+  // tiles and a metre or two of elevation error on a surface sample.
+  try { await Cesium.sampleTerrain(viewer.terrainProvider, SMALL_SCREEN ? 11 : 13, cg); }
+  catch { /* flat */ }
+  return cg.map(c => Number.isFinite(c.height) ? c.height : 0);
+}
+async function geochemLayer(set, el, size) {
+  const col = { au:2, cu:3, as:4, ag:5, mo:6 }[el];
+  if (set.mobile && col !== 2) return null;   // phone build is gold only
+  const br = set.breaks[el]; if (!br) return null;
+  const h = await drape(set.pts);
+  const pc = new Cesium.PointPrimitiveCollection({ blendOption: Cesium.BlendOption.OPAQUE });
+  set.pts.forEach((p, i) => {
+    const v = p[col]; if (v == null) return;
+    let t = 0; while (t < br.p.length && v >= br.p[t]) t++;
+    if (t === 0) return;                       // below the median: context, not signal
+    pc.add({ position: cart(p[0], p[1], h[i] + 6),
+      color: C(PCT[Math.min(t, PCT.length) - 1]).withAlpha(.94),
+      pixelSize: size + t * (size * .34),
+      scaleByDistance: new Cesium.NearFarScalar(2e3, 1.4, 3.4e4, .5),
+      disableDepthTestDistance: 900 });
+  });
+  pc.show = false;
+  // A field of coloured dots says "there is an anomaly" and nothing else. The
+  // strongest samples carry their actual grade, because the question a reader
+  // has in front of a geochem map is how high it goes, and a percentile ramp
+  // is deliberately incapable of answering it.
+  const lc = new Cesium.LabelCollection();
+  // Spatially de-clustered: the fourteen highest samples are all in the same
+  // two hot cores, so taking the top fourteen by grade stacks fourteen cards on
+  // two spots. Take the highest, then the highest that is at least 400 m from
+  // anything already taken, and so on — which is what a person labelling a map
+  // by hand does, and it spreads the callouts across the anomalies.
+  const MIN_SEP = 400 / 111320;      // degrees of latitude
+  const cosLat = Math.cos(57.79 * Math.PI/180);
+  const ranked = set.pts.map((p, i) => ({ p, i })).filter(o => o.p[col] != null)
+    .sort((a, b) => b.p[col] - a.p[col]);
+  const top = [];
+  for (const o of ranked) {
+    if (top.length === 12) break;
+    const far = top.every(t => Math.hypot((t.p[0]-o.p[0])*cosLat, t.p[1]-o.p[1]) > MIN_SEP);
+    if (far) top.push(o);
+  }
+  for (const { p, i } of top) {
+    lc.add({ position: cart(p[0], p[1], h[i] + 14),
+      text: p[col] >= 10 ? p[col].toFixed(0) + ' g/t' : p[col].toFixed(2) + ' g/t',
+      font: '500 11px "JetBrains Mono", monospace', fillColor: C('#FFE9B8'),
+      showBackground: true, backgroundColor: C('rgba(7,9,10,.88)'),
+      backgroundPadding: new Cesium.Cartesian2(6,4),
+      pixelOffset: new Cesium.Cartesian2(0,-12),
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+      translucencyByDistance: new Cesium.NearFarScalar(1.6e4, 1, 3e4, 0) });
+  }
+  lc.show = false; scene.primitives.add(lc);
+  const coll = scene.primitives.add(pc);
+  return { get show() { return pc.show; }, set show(v) { pc.show = lc.show = v; },
+           breaks: br };
+}
+stat('draping 5,526 geochemical samples on the DEM…');
+L.soil = await geochemLayer(D.soil, 'au', 5.5);
+L.rock = await geochemLayer(D.rock, 'au', 7);
+
+/* ---- drilling ----------------------------------------------------------- */
+stat('desurveying the drill holes…');
+{
+  // Line geometry is bucketed by zone at build time, because a Primitive is
+  // all-or-nothing: you cannot hide one instance inside it. One collection per
+  // zone is the only way a zone chapter can draw its own drilling and leave the
+  // other zone's rods out of the corner of the frame.
+  const plan = prims();
+  const ZONE_PRIMS = new Map();          // zone -> PrimitiveCollection
+  const byZone = new Map();              // zone -> {halo, line, bar}
+  const bucketOf = z => {
+    if (!byZone.has(z)) byZone.set(z, { halo: [], line: [], bar: [] });
+    return byZone.get(z);
+  };
+  const pp = [];
+  const collars = new Cesium.PointPrimitiveCollection();
+  const labels  = new Cesium.LabelCollection();
+  const pcollars = new Cesium.PointPrimitiveCollection();
+  const plabels  = new Cesium.LabelCollection();
+
+  for (const h of D.drill.holes) {
+    const pts = holePath(h), cum = cumulative(pts);
+    const planned = h.status === 'planned';
+
+    // The rod carries the ZONE and the bars carry the GRADE. One grey rod for
+    // every hole made a 45-hole property look like one campaign; GIC and
+    // T-Bill are different systems, three kilometres and forty years apart.
+    const bucket = planned ? null : (h.zone || '—');
+    const B = planned ? null : bucketOf(bucket);
+    if (!planned) B.halo.push(new Cesium.GeometryInstance({
+      geometry: new Cesium.PolylineGeometry({ positions: pts, width: 6.5,
+        vertexFormat: Cesium.PolylineColorAppearance.VERTEX_FORMAT }),
+      attributes: { color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+        C('rgba(6,8,9,.78)')) },
+    }));
+    (planned ? pp : B.line).push(new Cesium.GeometryInstance({
+      geometry: new Cesium.PolylineGeometry({ positions: pts, width: planned ? 2.6 : 3.4,
+        vertexFormat: Cesium.PolylineColorAppearance.VERTEX_FORMAT }),
+      attributes: { color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+        planned ? zoneC(h.zone).withAlpha(.7) : zoneC(h.zone)) },
+    }));
+
+    // Grade bars. Only above 0.1 g/t — below that the rod is drawn as rock,
+    // because a hole coloured end to end says every metre of it was interesting.
+    for (const [f, t, au] of (h.assay || [])) {
+      if (au == null) continue;
+      const c = auColor(au); if (!c) continue;
+      B.bar.push(new Cesium.GeometryInstance({
+        geometry: new Cesium.PolylineGeometry({
+          positions: [atDepth(pts,cum,f), atDepth(pts,cum,t)],
+          width: au >= 2 ? 18 : au >= 1 ? 14 : au >= 0.5 ? 10 : 6,
+          vertexFormat: Cesium.PolylineColorAppearance.VERTEX_FORMAT }),
+        attributes: { color: Cesium.ColorGeometryInstanceAttribute.fromColor(c) },
+        id: { hole: h.id, from: f, to: t, au },
+      }));
+    }
+
+    (planned ? pcollars : collars).add({ position: pts[0],
+      color: planned ? zoneC(h.zone).withAlpha(.7) : C('#E2E5E0'),
+      pixelSize: planned ? 5 : 6.5, outlineColor: C('rgba(7,9,10,.9)'), outlineWidth: 1.5,
+      disableDepthTestDistance: 400, id: { hole: h.id, zone: bucket } });
+
+    const lb = (planned ? plabels : labels).add({ position: pts[0], text: h.id,
+      font: '500 10px "JetBrains Mono", monospace',
+      fillColor: planned ? zoneC(h.zone) : C('#EDEEEC'),
+      showBackground: true, backgroundColor: C('rgba(7,9,10,.7)'),
+      backgroundPadding: new Cesium.Cartesian2(5,3),
+      pixelOffset: new Cesium.Cartesian2(0,-13),
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+      translucencyByDistance: new Cesium.NearFarScalar(2600, 1, 2850, 0) });
+    lb.__zone = bucket;
+  }
+
+  // Per-zone primitives, so a zone chapter can draw only its own drilling
+  // instead of every hole on the property with the far ones half in frame.
+  const mk = (inst, coll) => inst.length && coll.add(new Cesium.Primitive({
+    geometryInstances: inst, appearance: new Cesium.PolylineColorAppearance({ translucent: true }),
+    asynchronous: false }));
+  for (const [zone, g] of byZone) {
+    const coll = prims();
+    // Halo first, then the coloured line, then the grade bars on top.
+    mk(g.halo, coll); mk(g.line, coll); mk(g.bar, coll);
+    coll.show = false;
+    ZONE_PRIMS.set(zone, coll);
+  }
+  mk(pp, plan);
+  for (const c of [collars, labels, pcollars, plabels]) scene.primitives.add(c);
+
+  plan.show = false;
+  collars.show = labels.show = pcollars.show = plabels.show = false;
+  // Planned collars and their labels belong to the planned layer, not the
+  // drilled one. Sharing a collection put seventeen holes that do not exist on
+  // every drilling slide, labelled exactly like the ones that do.
+  // Zone scoping is done on the collections that are cheap to filter: the
+  // points and labels carry a zone, and the line primitives are split by zone
+  // at build time below.
+  let scoped = null, hushAll = false;
+  L.holes = {
+    show: v => {
+      collars.show = labels.show = v;
+      ZONE_PRIMS.forEach(c => { c.show = v && (!scoped || ZONE_PRIMS.get(scoped) === c); });
+    },
+    hush: v => { hushAll = !!v; },
+    only: z => {
+      scoped = z || null;
+      for (let i = 0; i < collars.length; i++) {
+        const p = collars.get(i);
+        p.show = !z || (p.id && p.id.zone === z);
+      }
+      for (let i = 0; i < labels.length; i++) {
+        const l = labels.get(i);
+        l.show = (!z || l.__zone === z) && !hushAll;
+      }
+      ZONE_PRIMS.forEach((c, key) => { c.show = collars.show && (!z || key === z); });
+    },
+  };
+  L.planned = { show: v => { plan.show = pcollars.show = plabels.show = v; } };
+}
+
+/* ---- geophysics --------------------------------------------------------- */
+/* Each product drapes on ITS OWN extent, never the union of the set: the 2020
+   airborne block is 23 km across and the 2021 ground IP is 4.5 km, and
+   stretching one to the other's corners moves the anomaly by kilometres. */
+const RAW = {}; for (const p of D.geo.products) RAW[p.key] = { meta: p, layer: null };
+
+/* A displayed product may be more than one raster. Neither magnetic survey
+   covers the whole claim block on its own — the 2020 heliborne block stops
+   30 km short of the southern tenures and the 2021 VTEM stops short of the
+   eastern ones — but their union covers all eleven, so "Magnetics" is both,
+   each still draped on its OWN extent. Showing one and calling it the
+   property's magnetics would leave a third of the ground silently unflown. */
+const GEO = {
+  mag:        { label:'Magnetics — RTP',            of:['mag_rtp','vtem_rtp'] },
+  mag_cvg:    { label:'Magnetics — vertical grad.', of:['mag_cvg'] },
+  mag_tmi:    { label:'Magnetics — TMI',            of:['mag_tmi'] },
+  ip_chg_50:  { label:'IP chargeability — 50 m',    of:['ip_chg_50'] },
+  ip_chg_100: { label:'IP chargeability — 100 m',   of:['ip_chg_100'] },
+  ip_res_100: { label:'IP resistivity — 100 m',     of:['ip_res_100'] },
+};
+let geoOn = null, geoOpacity = .72;
+async function ensureRaster(k) {
+  const g = RAW[k]; if (!g || g.layer) return;
+  const r = g.meta.rect;
+  g.layer = viewer.imageryLayers.addImageryProvider(
+    await Cesium.SingleTileImageryProvider.fromUrl(
+      (SMALL_SCREEN && g.meta.file_m) || g.meta.file, {
+      rectangle: Cesium.Rectangle.fromDegrees(r[0], r[1], r[2], r[3]) }));
+  g.layer.show = false;
+}
+function prefetch(ch) {
+  // Not on a phone. Prefetch trades memory for smoothness, and memory is the
+  // resource that is short on the device this matters to.
+  if (SMALL_SCREEN) return;
+  const k = ch && ch.geo; if (!k || !GEO[k]) return;
+  for (const r of GEO[k].of) ensureRaster(r).catch(() => {});
+}
+
+async function showGeo(key) {
+  if (geoOn === key) return;
+  geoOn = key;
+  const want = new Set((key && GEO[key] ? GEO[key].of : []));
+  for (const k in RAW) {
+    if (!want.has(k)) { if (RAW[k].layer) RAW[k].layer.show = false; continue; }
+    await ensureRaster(k);
+    const g = RAW[k];
+    g.layer.show = true; g.layer.alpha = geoOpacity;
+  }
+  render();
+}
+$('#gnd').addEventListener('input', e => ground(e.target.value / 100));
+$('#gop').addEventListener('input', e => {
+  geoOpacity = e.target.value / 100;
+  for (const k in RAW) if (RAW[k].layer) RAW[k].layer.alpha = geoOpacity;
+  render();
+});
+
+/* ---- grade callouts ----------------------------------------------------- */
+/* Every hole that returned a composite carries its best one. Seven cards on a
+   45-hole property meant thirty-eight holes were drawn as anonymous rods, and
+   the question in front of a drill fan is what came out of it.
+
+   Cards are spatially de-clustered and parked in a column on alternating
+   sides, because holes collared 30 m apart put their intercept midpoints
+   within a few pixels of each other and any offset small enough to look
+   attached is too small to stop the collision. */
+{
+  const ds = new Cesium.CustomDataSource('picks');
+  const byHole = new Map(D.drill.holes.map(h => [h.id, h]));
+  const best = new Map();
+  for (const i of D.drill.intercepts) {
+    if (i.el !== 'Au') continue;
+    const cur = best.get(i.hole);
+    if (!cur || i.len * i.grade > cur.len * cur.grade) best.set(i.hole, i);
+  }
+  const MIN_SEP = 210 / 111320, cosLat = Math.cos(57.79 * Math.PI/180);
+  const ranked = [...best.values()].sort((a, b) => b.len*b.grade - a.len*a.grade);
+  const shown = [];
+  for (const i of ranked) {
+    const h = byHole.get(i.hole); if (!h) continue;
+    const far = shown.every(t => Math.hypot(
+      (t.h.collar[0]-h.collar[0])*cosLat, t.h.collar[1]-h.collar[1]) > MIN_SEP);
+    if (far) shown.push({ i, h, rank: shown.length });
+    if (shown.length === 18) break;
+  }
+  shown.sort((a, b) => a.h.collar[1] - b.h.collar[1]);
+  shown.forEach(({ i, h, rank }, n) => {
+    const pts = holePath(h), cum = cumulative(pts);
+    const mid = atDepth(pts, cum, (i.from + i.to) / 2);
+    // Always to the LEFT. Alternating sides fitted more cards, and the
+    // right-hand ones ran under the caption — which cannot be predicted at
+    // build time, because it depends on where the camera lands. Leftward is
+    // always into the clear area the aim shift opens up.
+    ds.entities.add({ position: mid, label: {
+      text: `${i.hole}   ${i.len} m @ ${Number(i.grade).toFixed(2)} g/t Au`,
+      font: '500 11.5px "JetBrains Mono", monospace', fillColor: C('#F4E3B0'),
+      showBackground: true, backgroundColor: C('rgba(7,9,10,.9)'),
+      backgroundPadding: new Cesium.Cartesian2(9,6),
+      horizontalOrigin: Cesium.HorizontalOrigin.RIGHT,
+      pixelOffset: new Cesium.Cartesian2(-22, -14 - (n % 4) * 34),
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+      // Below the top few, a card only earns its place once the reader is
+      // close enough for it not to be one of forty overlapping rectangles.
+      translucencyByDistance: (d => new Cesium.NearFarScalar(d, 1, d * 1.01, 0))(
+        rank < 4 ? 16000 : 5000) }});
+    ds.entities.add({ position: mid, point: { pixelSize: 5, color: C('#F4E3B0'),
+      disableDepthTestDistance: Number.POSITIVE_INFINITY }});
+    const card = ds.entities.values[ds.entities.values.length - 2];
+    LBL.push({ ent: card,
+               base: (card.label.pixelOffset && card.label.pixelOffset.getValue())
+                     || new Cesium.Cartesian2(0, 0),
+               pri: 700 - rank });      // gram-metre order, best kept longest
+  });
+  viewer.dataSources.add(ds); ds.show = false;
+  // The callout already says WM22-03. Printing it again on the collar put the
+  // same hole id twice within forty pixels of itself.
+  L.picks = { get show() { return ds.show; },
+              set show(v) { ds.show = v; },
+              named: new Set(shown.map(x => x.i.hole)) };
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   CHAPTERS
+   Each declares the layers it needs and where to stand. Nothing here asserts a
+   number the data does not carry: every figure in `fig` is computed below from
+   the extracted files, not typed in.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ---- rail --------------------------------------------------------------- */
+{
+  const rail = $('#rail'); let sec = null;
+  CH.forEach((c, i) => {
+    if (c.sec !== sec) { sec = c.sec;
+      const h = document.createElement('div'); h.className = 'sec'; h.textContent = sec; rail.append(h); }
+    const b = document.createElement('button');
+    b.innerHTML = `<span class="num">${String(i+1).padStart(2,'0')}</span><span>${chText(i,'t')}</span>`;
+    b.onclick = () => go(i); rail.append(b);
+  });
+}
+
+/* ---- geophysics + layer controls --------------------------------------- */
+{
+  const geo = $('#geo');
+  const add = (host, label, on, get) => {
+    const b = document.createElement('button'); b.className = 'lay';
+    b.innerHTML = `<i></i><span>${label}</span>`;
+    b.setAttribute('aria-pressed','false'); b.onclick = on; host.append(b); return b;
+  };
+  const gbtns = {};
+  gbtns[''] = add(geo, 'None', () => { showGeo(null); syncGeo(); });
+  for (const k of Object.keys(GEO))
+    gbtns[k] = add(geo, GEO[k].label, () => { showGeo(k); syncGeo(); });
+  window.syncGeo = () => { for (const k in gbtns)
+    gbtns[k].setAttribute('aria-pressed', String((geoOn || '') === k)); };
+
+  const lays = $('#lays'), lb = {};
+  const T = { district:'District holders', claims:'Claim block', zones:'GIC / T-Bill',
+              holes:'Drill holes', planned:'Planned holes',
+              soil:'Soil geochem', rock:'Rock geochem', picks:'Intercept callouts' };
+  for (const k of Object.keys(T)) {
+    lb[k] = add(lays, T[k], () => { const v = lb[k].getAttribute('aria-pressed') !== 'true';
+      setLayer(k, v); lb[k].setAttribute('aria-pressed', String(v)); render(); });
+  }
+  window.syncLays = on => { for (const k in lb) lb[k].setAttribute('aria-pressed', String(on.has(k))); };
+}
+function setLayer(k, v) {
+  const l = L[k]; if (!l) return;
+  if (typeof l.show === 'function') l.show(v); else l.show = v;
+}
+
+/* ---- legend ------------------------------------------------------------- */
+/* The legend carries VALUES. A key reading "90–95th percentile" tells a reader
+   where a sample sits in a distribution they cannot see; "0.52–1.1 g/t" tells
+   them what is in the ground, which is the question. Percentiles decide the
+   colour because the data is lognormal; they do not have to be what is printed. */
+const g = v => v >= 10 ? v.toFixed(0) : v >= 1 ? v.toFixed(1) : v.toFixed(2);
+function legend(kind) {
+  const el = $('#legend'); el.classList.toggle('on', !!kind); el.innerHTML = '';
+  if (!kind) return;
+  let head, items;
+  if (kind === 'au') {
+    head = 'Au g/t, downhole'; items = AU_TIERS.map(t => [t.c, t.label]);
+  } else {
+    const br = (kind === 'soil' ? D.soil : D.rock).breaks.au.p;
+    head = (kind === 'soil' ? 'Au g/t in soil' : 'Au g/t in rock');
+    items = PCT.slice(0, br.length).map((c, i) =>
+      [c, i === br.length - 1 ? `${g(br[i])} +` : `${g(br[i])} – ${g(br[i+1])}`]);
+  }
+  el.insertAdjacentHTML('beforeend', `<span style="color:var(--fg3)">${head}</span>`);
+  for (const [c, t] of items)
+    el.insertAdjacentHTML('beforeend', `<div class="k"><i style="background:${c}"></i><span>${t}</span></div>`);
+}
+
+/* Zones get their own key, always on once the zones layer is, because the rod
+   colour means nothing without it. */
+function zoneKey(on) {
+  const el = $('#zkey'); el.classList.toggle('on', on); if (!on) return;
+  el.innerHTML = D.drill.zones.map(z =>
+    `<div class="k"><i style="background:${ZONE[z.name]}"></i><span>${z.name}</span></div>`).join('');
+}
+
+/* ---- label declutter, in screen space ------------------------------------
+   Zone names and grade callouts were placed with fixed pixel offsets, which is
+   the same mistake the district map made in degrees: an offset that separates
+   two labels at one camera does nothing at another. It shows up as the zone
+   stats landing on the other zone's name at wide range, and as drill callouts
+   stacking on each other whenever two holes share a modulo.
+
+   So the offsets are solved rather than declared: measure each label, walk them
+   by priority, keep the declared offset if its rectangle is free and otherwise
+   search outward in pixels for one that is. Solved once when the camera lands
+   and then left alone — a label that re-solves while you look at it never
+   settles, which is the lesson from the district map.
+
+   Priority: zone names, then their stats, then callouts by gram-metre — so
+   what gets dropped when a frame is genuinely full is the least important
+   thing in it, not the last one drawn. */
+function measure(e) {
+  const t = String(e.label.text.getValue());
+  const fs = parseInt((e.label.font.getValue().match(/(\d+)px/) || [0, 14])[1], 10);
+  const lines = t.split('\n');
+  const pad = (e.label.backgroundPadding && e.label.backgroundPadding.getValue())
+              || { x: 7, y: 5 };
+  return { w: Math.max(...lines.map(l => l.length)) * fs * 0.58 + pad.x * 2,
+           h: fs * 1.28 * lines.length + pad.y * 2 };
+}
+function declutterLabels() {
+  const S = scene, W = S.canvas.clientWidth, H = S.canvas.clientHeight;
+  for (const it of LBL) {
+    const ds = it.ent.entityCollection && it.ent.entityCollection.owner;
+    it.ent.__on = !!(ds && ds.show) && it.ent.label.show !== false;
+  }
+  const taken = [];
+  for (const it of [...LBL].sort((a, b) => b.pri - a.pri)) {
+    const e = it.ent;
+    if (!e.__on) { e.show = false; continue; }
+    const pos = e.position.getValue();
+    const p = pos && Cesium.SceneTransforms.worldToWindowCoordinates(S, pos);
+    if (!p) { e.show = false; continue; }
+    const m = measure(e);
+    const gv = (prop, dflt) => (prop && prop.getValue) ? (prop.getValue() ?? dflt) : dflt;
+    const ho = gv(e.label.horizontalOrigin, Cesium.HorizontalOrigin.CENTER);
+    const vo = gv(e.label.verticalOrigin, Cesium.VerticalOrigin.CENTER);
+    const rect = (ox, oy) => {
+      const x0 = ho === 1 ? p.x + ox : ho === -1 ? p.x + ox - m.w : p.x + ox - m.w / 2;
+      const y0 = vo === 1 ? p.y + oy - m.h : vo === -1 ? p.y + oy : p.y + oy - m.h / 2;
+      return { x0, x1: x0 + m.w, y0, y1: y0 + m.h };
+    };
+    const free = r => r.x1 > 0 && r.x0 < W && r.y1 > 0 && r.y0 < H &&
+      taken.every(q => r.x0 > q.x1 || r.x1 < q.x0 || r.y0 > q.y1 || r.y1 < q.y0);
+
+    let best = null;
+    if (free(rect(it.base.x, it.base.y))) best = it.base;
+    else {
+      // bias +1 searches up-screen first, -1 down-screen first, 0 alternates.
+      const order = it.bias > 0 ? [1, 2, 3, 4, -1, -2] :
+                    it.bias < 0 ? [-1, -2, -3, -4, 1, 2] : [1, -1, 2, -2, 3, -3];
+      outer: for (let ring = 1; ring <= 7; ring++)
+        for (const k of order) {
+          const oy = it.base.y - ring * (m.h + 7) * Math.sign(k);
+          const ox = it.base.x + (Math.abs(k) > 2 ? Math.sign(k) * ring * 26 : 0);
+          if (free(rect(ox, oy))) { best = new Cesium.Cartesian2(ox, oy); break outer; }
+        }
+    }
+    if (!best) { e.show = false; continue; }
+    e.show = true;
+    e.label.pixelOffset = best;
+    taken.push(rect(best.x, best.y));
+  }
+  render();
+}
+
+/* ---- camera authoring ----------------------------------------------------
+   Open with ?admin=1. Fly the view by hand, press Lock, and that slide keeps
+   exactly what you framed.
+
+   A locked camera stores the FINAL position and orientation, and the chapter
+   then bypasses `frameFor` entirely. The alternative — storing a target and
+   letting the aim shift re-derive the camera — means what you framed and what
+   the deck flies to are computed by different code, and the whole reason this
+   exists is that hand-tuned targets and the aim shift kept disagreeing.
+
+   Locks live in localStorage while authoring, so nothing is lost between
+   reloads, and Copy emits a CAM_FIXED literal to paste into this file, so the
+   deck ships with them rather than depending on one browser's storage. */
+const CAM_KEY = 'bedrock.williams.cams';
+
+// Locked cameras that ship with the deck. Paste the output of Copy here.
+const CAM_FIXED = {};
+
+let CAM_LOCK = {};
+try { CAM_LOCK = { ...CAM_FIXED, ...JSON.parse(localStorage.getItem(CAM_KEY) || '{}') }; }
+catch { CAM_LOCK = { ...CAM_FIXED }; }
+
+const readCamera = () => {
+  const c = scene.camera, g = c.positionCartographic;
+  // Cesium reports a level camera's roll as ~360°, and flying to that spins it
+  // through a full turn on arrival. Normalised to (-180, 180].
+  const norm = d => { d %= 360; return d > 180 ? d - 360 : d <= -180 ? d + 360 : d; };
+  return { lon: +Cesium.Math.toDegrees(g.longitude).toFixed(6),
+           lat: +Cesium.Math.toDegrees(g.latitude).toFixed(6),
+           height: Math.round(g.height),
+           heading: +Cesium.Math.toDegrees(c.heading).toFixed(2),
+           pitch: +Cesium.Math.toDegrees(c.pitch).toFixed(2),
+           roll: +norm(Cesium.Math.toDegrees(c.roll)).toFixed(2) };
+};
+
+function editorUI() {
+  document.body.insertAdjacentHTML('beforeend', `<div id="admin">
+    <div class="hd">Edit slide <span id="ad_ch"></span>
+      <button id="ad_close" title="Close">✕</button></div>
+
+    <div class="sec">Camera</div>
+    <div class="ro" id="ad_now">—</div>
+    <div class="bt">
+      <button id="ad_lock">Lock this view</button>
+      <button id="ad_clear">Unlock</button>
+    </div>
+
+    <div class="sec">Caption</div>
+    <label>Eyebrow</label><input id="ad_ey" type="text">
+    <label>Title</label><textarea id="ad_t" rows="2"></textarea>
+    <label>Body</label><textarea id="ad_b" rows="7"></textarea>
+    <div class="bt"><button id="ad_revert">Revert text</button></div>
+
+    <div class="sec">Export</div>
+    <div class="bt">
+      <button id="ad_copy">Copy changes</button>
+      <button id="ad_reset">Reset all</button>
+    </div>
+    <div class="st" id="ad_msg">Fly the view, then Lock. Text saves as you type.</div>
+  </div>`);
+  const $$ = id => document.getElementById(id);
+  const saveCam = () => localStorage.setItem(CAM_KEY, JSON.stringify(CAM_LOCK));
+  const saveTxt = () => localStorage.setItem(TXT_KEY, JSON.stringify(TXT_LOCK));
+
+  const refresh = () => {
+    const c = readCamera();
+    $$('ad_ch').textContent = `${cur + 1}/${CH.length}` + (CAM_LOCK[cur] ? ' · locked' : '');
+    $$('ad_now').textContent =
+      `${c.lat.toFixed(4)}, ${c.lon.toFixed(4)}\n${c.height.toLocaleString()} m · ` +
+      `hdg ${c.heading.toFixed(0)}° · pitch ${c.pitch.toFixed(0)}°`;
+    if (document.activeElement && document.activeElement.closest('#admin') &&
+        /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;   // do not fight the typist
+    $$('ad_ey').value = chText(cur, 'ey');
+    $$('ad_t').value  = chText(cur, 't');
+    $$('ad_b').value  = chText(cur, 'b');
+  };
+  scene.camera.changed.addEventListener(refresh);
+  scene.camera.percentageChanged = 0.02;
+  window.__adminRefresh = refresh;
+
+  const edit = (field, el) => el.addEventListener('input', () => {
+    TXT_LOCK[cur] = { ...(TXT_LOCK[cur] || {}), [field]: el.value };
+    saveTxt();
+    // Repaint the caption live rather than on slide change — an editor that
+    // only shows its result after you leave is one you cannot judge by.
+    $('#cap_e').textContent = chText(cur, 'ey');
+    $('#cap_t').textContent = chText(cur, 't');
+    $('#cap_b').textContent = chText(cur, 'b');
+    $$('ad_msg').textContent = 'Text saved for this slide.';
+  });
+  edit('ey', $$('ad_ey')); edit('t', $$('ad_t')); edit('b', $$('ad_b'));
+
+  $$('ad_lock').onclick = () => {
+    CAM_LOCK[cur] = readCamera(); saveCam(); refresh();
+    $$('ad_msg').textContent = `Slide ${cur + 1} camera locked.`;
+  };
+  $$('ad_clear').onclick = () => {
+    delete CAM_LOCK[cur]; saveCam(); refresh(); go(cur);
+    $$('ad_msg').textContent = `Slide ${cur + 1} back to its built-in camera.`;
+  };
+  $$('ad_revert').onclick = () => {
+    delete TXT_LOCK[cur]; saveTxt(); refresh(); go(cur);
+    $$('ad_msg').textContent = `Slide ${cur + 1} text restored.`;
+  };
+  $$('ad_reset').onclick = () => {
+    if (!confirm('Discard every camera lock and text edit?')) return;
+    CAM_LOCK = {}; TXT_LOCK = {}; saveCam(); saveTxt(); refresh(); go(cur);
+    $$('ad_msg').textContent = 'All edits discarded.';
+  };
+  $$('ad_copy').onclick = () => {
+    const lit = o => '{\n' + Object.keys(o).sort((a, b) => a - b)
+      .map(k => `  ${k}: ${JSON.stringify(o[k])},`).join('\n') + '\n}';
+    const txt = `const CAM_FIXED = ${lit(CAM_LOCK)};\n\nconst TEXT_FIXED = ${lit(TXT_LOCK)};`;
+    navigator.clipboard?.writeText(txt).then(
+      () => { $$('ad_msg').textContent = 'Copied — paste over CAM_FIXED and TEXT_FIXED in index.html.'; },
+      () => prompt('Paste these into index.html:', txt));
+  };
+  $$('ad_close').onclick = () => toggleEditor(false);
+  refresh();
+}
+
+let editorOpen = false;
+function toggleEditor(on) {
+  editorOpen = on ?? !editorOpen;
+  const rail = document.getElementById('rail');
+  if (editorOpen) {
+    if (!document.getElementById('admin')) editorUI();
+    document.getElementById('admin').style.display = 'block';
+    if (rail) rail.style.top = '520px';
+  } else {
+    const a = document.getElementById('admin'); if (a) a.style.display = 'none';
+    if (rail) rail.style.top = '118px';
+  }
+  const b = document.getElementById('editbtn');
+  if (b) b.setAttribute('aria-pressed', String(editorOpen));
+  render();
+}
+
+/* ---- transitions -------------------------------------------------------- */
+/* Duration from distance, not a constant: a 12 km establishing move and a
+   400 m nudge cannot share one flight time, and shortest-arc on the heading so
+   350° → 10° does not whip-pan the long way round. */
+let cur = -1, playing = false, timer = null, frozenOnce = false;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function flightTime(from, to) {
+  if (REDUCED) return 0;
+  const d = Cesium.Cartesian3.distance(from, to);
+  return Math.min(4.2, Math.max(1.2, 1.1 + d / 4200));
+}
+
+/* A chapter declares the point it is about and how far back to stand, and the
+   camera position is derived. Declaring the position instead means every pitch
+   change silently re-aims the shot: at -42° and 16 km back, the subject is 18 km
+   in front of the camera, and chapter one framed the ridge north of the claims. */
+/* The centre of the canvas is not the centre of what anyone can see. A chapter
+   rail holds the left ~240 px and a caption card holds the right ~470 px, so a
+   subject aimed at the geometric centre lands under the paragraph describing
+   it — the T-Bill zone was half behind its own caption on three chapters.
+
+   Rather than nudge fourteen cameras by hand, the AIM POINT is shifted
+   screen-right by the difference between the canvas centre and the clear
+   area's centre, which puts the subject in the middle of the visible gap. The
+   shift is in metres on the ground, derived from the range and the field of
+   view, so it holds at 1.5 km and at 190 km. */
+function aimShift(range, cards, pitchDeg) {
+  const w = scene.canvas.clientWidth, h = scene.canvas.clientHeight;
+  if (w < 900) return { x: 0, y: 0 };            // stacked layout: no side strips
+  const fovX = scene.camera.frustum.fov;
+  const fovY = 2 * Math.atan(Math.tan(fovX / 2) / (w / h));
+
+  // Horizontal: the chapter rail holds the left, the caption the right, and a
+  // chapter showing grade callouts needs another card-width of room because
+  // they all extend leftward from their anchors.
+  const clearL = 264 + (cards ? 300 : 0), clearR = w - 500;
+  const px = w / 2 - (clearL + clearR) / 2;
+  const x = (px / w) * (2 * range * Math.tan(fovX / 2));
+
+  // Vertical: the caption fills the bottom right and the legends the bottom
+  // left, so the clear band ends well above the canvas centre. Ground distance
+  // per screen pixel grows as the camera flattens, hence the sin(pitch) term —
+  // at -14° a hundred pixels is four times the ground it covers at -60°.
+  const clearT = 96, clearB = h - 420;
+  const py = h / 2 - (clearT + clearB) / 2;      // >0 → subject must move up
+  // The DESTINATION's pitch, not the camera's current one. aimShift runs before
+  // the flight, so reading the live camera measured the chapter you are leaving:
+  // arriving at slide 12 (-48°) from slide 11 (-15°) scaled the vertical shift
+  // by sin(15°) instead of sin(48°) — nearly three times too far, and the claim
+  // block left the top of the frame. Worse than wrong, it was NON-DETERMINISTIC:
+  // the same slide framed differently depending on which slide you came from,
+  // which is why jumping straight to it in a test looked correct.
+  const pitch = Math.abs(Cesium.Math.toRadians(pitchDeg)) || Math.PI / 4;
+  const y = (py / h) * (2 * range * Math.tan(fovY / 2)) / Math.max(0.25, Math.sin(pitch));
+  return { x, y };
+}
+
+function frameFor(c, shift) {
+  let lon = c.cam.lon, lat = c.cam.lat;
+  if (shift) {
+    const m = aimShift(c.cam.range, (c.layers || []).includes('picks'), c.cam.pitch);
+    // Screen-right on the ground is the heading turned 90°; screen-up is the
+    // heading reversed, because a subject BEYOND the aim point rides higher in
+    // frame. Both are applied to the aim point, never to the camera.
+    const br = Cesium.Math.toRadians(c.cam.heading + 90);
+    const bu = Cesium.Math.toRadians(c.cam.heading + 180);
+    const north = m.x * Math.cos(br) + m.y * Math.cos(bu);
+    const east  = m.x * Math.sin(br) + m.y * Math.sin(bu);
+    lat += north / 111320;
+    lon += east / (111320 * Math.cos(lat * Math.PI / 180));
+  }
+  const target = cart(lon, lat, c.cam.alt ?? 1500);
+  return { target, offset: new Cesium.HeadingPitchRange(
+    Cesium.Math.toRadians(c.cam.heading), Cesium.Math.toRadians(c.cam.pitch), c.cam.range) };
+}
+
+async function go(i, establish) {
+  if (i < 0 || i >= CH.length) return;
+  const c = CH[i], prev = cur; cur = i;
+
+  // Layers are armed BEFORE the camera moves, so the destination is drawn on
+  // arrival rather than popping into existence once the flight has landed.
+  const on = new Set(c.layers || []);
+  for (const k of Object.keys(L)) setLayer(k, on.has(k));
+  if (window.__adminRefresh) setTimeout(window.__adminRefresh, 60);
+  if (L.claims.nameplate) L.claims.nameplate(!!c.nameplate);
+  if (L.holes.hush) L.holes.hush(on.has('picks'));
+  if (L.holes.only) L.holes.only(c.zone || null);
+  syncLays(on);
+  await showGeo(c.geo || null); syncGeo();
+  ground(c.ground ?? 1);
+  legend(c.legend);
+  zoneKey((c.layers||[]).includes('zones') || (c.layers||[]).includes('holes'));
+  if (L.zones.labels) {
+    L.zones.labels(!on.has('soil') && !on.has('rock') && !on.has('picks'), c.zone);
+    L.zones.fill(!c.geo);
+  }
+
+  $('#cap_e').textContent = chText(i, 'ey');
+  $('#cap_t').textContent = chText(i, 't');
+  $('#cap_b').textContent = chText(i, 'b');
+  $('#cap_f').innerHTML = (c.fig || []).map(([v,l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('');
+  $('#count').textContent = `${i+1} / ${CH.length}`;
+  document.querySelectorAll('#rail button').forEach((b, n) =>
+    b.setAttribute('aria-current', String(n === i)));
+
+  // The district layout is solved on arrival at the opening frame and then
+  // held. Freezing before the camera lands would solve it for a frame nobody
+  // sees.
+  const settle = () => {
+    if (i === 0 && !frozenOnce) {
+      frozenOnce = true; render();
+      setTimeout(() => { freezeDistrict(); render(); }, 400);
+    }
+    // Labels are solved on arrival, once. Solving during the flight places them
+    // for a frame nobody sees; solving every frame is the sliding the district
+    // map was frozen to stop.
+    setTimeout(declutterLabels, 120);
+  };
+  const lock = CAM_LOCK[i];
+  const { target, offset } = lock ? { target: null, offset: null } : frameFor(c, true);
+  if (establish && c.from && !REDUCED) {
+    const f = frameFor({ cam: c.from }, true);
+    viewer.camera.lookAt(f.target, f.offset);
+    viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+    // Wait for the frame to actually be drawn before flying out of it. A fixed
+    // delay is a guess about someone else's network; `tilesLoaded` is the
+    // answer. Capped, because a deck that will not open until the last tile
+    // arrives is a deck that does not open.
+    render();
+    await new Promise(done => {
+      const t0 = Date.now();
+      const tick = () => {
+        if (scene.globe.tilesLoaded || Date.now() - t0 > 6000) return done();
+        render(); requestAnimationFrame(tick);
+      };
+      tick();
+    });
+    await new Promise(r => setTimeout(r, 900));   // beat to read it
+  }
+  const dur = establish ? (c.from && !REDUCED ? 4.8 : 0)
+    : flightTime(scene.camera.positionWC,
+                 target || cart(lock.lon, lock.lat, lock.height));
+  if (lock) {
+    // A locked camera is flown to directly — no bounding sphere, no aim shift.
+    viewer.camera.flyTo({
+      destination: cart(lock.lon, lock.lat, lock.height),
+      orientation: { heading: Cesium.Math.toRadians(lock.heading),
+                     pitch: Cesium.Math.toRadians(lock.pitch),
+                     roll: Cesium.Math.toRadians(lock.roll || 0) },
+      duration: dur, easingFunction: Cesium.EasingFunction.QUADRATIC_IN_OUT,
+      complete: settle });
+  } else {
+    viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(target, 1), {
+      offset, duration: dur, easingFunction: Cesium.EasingFunction.QUADRATIC_IN_OUT,
+      complete: settle });
+  }
+  if (dur === 0) settle();      // an instant move fires no completion callback
+  render();
+
+  prefetch(CH[i + 1]);
+  if (playing) { clearTimeout(timer); timer = setTimeout(() =>
+    cur < CH.length - 1 ? go(cur + 1) : setPlay(false), (dur + 7.5) * 1000); }
+}
+
+function setPlay(v) {
+  playing = v; $('#play').setAttribute('aria-pressed', String(v));
+  $('#play').textContent = v ? 'Pause' : 'Play';
+  clearTimeout(timer);
+  if (v) timer = setTimeout(() => cur < CH.length - 1 ? go(cur + 1) : setPlay(false), 7500);
+}
+
+window.__go = go;
+Object.defineProperty(window, 'geoOn', { get: () => geoOn });
+{
+  const btn = $('#layers'), pan = $('#panel');
+  const setOpen = v => { pan.classList.toggle('open', v);
+    btn.setAttribute('aria-expanded', String(v)); btn.setAttribute('aria-pressed', String(v)); };
+  btn.onclick = e => { e.stopPropagation(); setOpen(!pan.classList.contains('open')); };
+  // Click-away closes it. A panel that covers a third of the scene and can only
+  // be dismissed by finding the button again is a panel people leave open.
+  addEventListener('pointerdown', e => {
+    if (pan.classList.contains('open') && !pan.contains(e.target) && e.target !== btn) setOpen(false);
+  });
+  addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
+}
+
+$('#next').onclick = () => go(cur + 1);
+$('#prev').onclick = () => go(cur - 1);
+$('#play').onclick = () => setPlay(!playing);
+addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+  if (e.key === 'ArrowLeft') go(cur - 1);
+  if (e.key === 'Escape') $('#prov').classList.remove('on');
+});
+
+/* ---- hover readout ------------------------------------------------------ */
+{
+  const tip = $('#tip');
+  const h = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+  const byId = new Map(D.drill.holes.map(x => [x.id, x]));
+  h.setInputAction(m => {
+    const p = scene.pick(m.endPosition);
+    const id = p && p.id;
+    if (id && id.hole) {
+      const H = byId.get(id.hole);
+      const lines = [`${H.id}`,
+        `${H.status === 'planned' ? 'planned' : H.year} · ${H.zone || 'unassigned'}`,
+        `${H.depth} m · ${H.az != null ? H.az.toFixed(0)+'° / '+H.inc.toFixed(0)+'°' : 'no survey'}`];
+      if (id.au != null) lines.push(`${id.from}–${id.to} m: ${id.au} g/t Au`);
+      tip.innerHTML = `<b>${lines[0]}</b>\n` + lines.slice(1).join('\n');
+      tip.style.display = 'block';
+      tip.style.left = Math.min(m.endPosition.x + 16, innerWidth - 230) + 'px';
+      tip.style.top  = (m.endPosition.y + 16) + 'px';
+    } else tip.style.display = 'none';
+  }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+}
+
+/* ---- sources ------------------------------------------------------------ */
+/* Built as a string so BOTH the drawer and the text fallback show the same
+   audit trail. Two copies of a provenance list is one copy too many — the
+   whole point of it is that there is a single answer to where a number came
+   from. */
+function sourcesHTML() {
+  const rows = [
+    ['Drill collars & surveys', `q_ddh_collar.csv, q_ddh_survey.csv, q_ddh_desurvey.csv — ${D.drill.holes.length} collars, ${dr.length} drilled and ${pl.length} planned. Traces are the operator's own minimum-curvature desurvey, used as supplied.`],
+    ['Assays', `q_ddh_samp_int_assay_i1.csv — ${nf(D.drill.holes.reduce((a,h)=>a+(h.assay?h.assay.length:0),0))} sampled intervals across ${D.drill.holes.filter(h=>h.assay).length} holes, 1983 to 2024.`],
+    ['Compositing rule', D.drill.rule + '.'],
+    ['Soil geochemistry', `q_samp_pt_assay_soil.csv — ${nf(D.soil.pts.length)} samples, 1973 to 2021, coloured on percentile breaks computed over this survey.`],
+    ['Phone build', `On a small screen this deck loads reduced data: geochemical samples at or above the median only (the rest are never drawn), gold only, and geophysics grids at 900 px rather than 2,400. Drilling, claims and every figure quoted are identical to the desktop build.`],
+    ['Sample elevations', `895 of ${nf(D.soil.pts.length)} soil samples and 259 of ${nf(D.rock.pts.length)} rock samples carry a recorded elevation; the rest were plotted on a map and never surveyed. All of them are draped on the public DEM rather than mixing surveyed and interpolated heights in one layer.`],
+    ['Rock geochemistry', `q_samp_pt_assay_rock.csv — ${nf(D.rock.pts.length)} of ${nf(D.rock.source_rows)} samples. ${D.rock.dropped_offsite} sit hundreds of kilometres off the property and are dropped as transcription errors rather than plotted.`],
+    ['Magnetics', '2020 heliborne survey (25 m grid) and 2021 VTEM Plus (10 m), both reduced to pole. Neither covers the claim block alone; their union covers all eleven tenures, so the Magnetics layer draws both, each placed from its own GeoTIFF tags (EPSG:32609) and on its own extent. They are separately levelled — colour is not comparable across the seam between them.'],
+    ['Induced polarisation', '2021 ground DCIP over the Walcott lines, inverted — chargeability and resistivity at 25/50/100/150 m. EPSG:3156, placed from the file.'],
+    ['VTEM', '2021 VTEM Plus airborne survey — RTP magnetics shown; the DCIP and MVI voxels and isosurfaces in the data room are not yet read.'],
+    ['Mineral tenure', `${M.source} via openmaps.gov.bc.ca, ${M.licence}. Queried ${M.as_of.slice(0,10)}. ${M.subject_tenures} tenures held by ${M.subject}, ${ha(M.subject_ha)} ha.`],
+    ['District holders', `${DIST.length} registered holders of 2,000 ha or more inside the Toodoggone corridor, consolidated into one block each. Individuals are omitted from the district map; a prospector's two claims are not a neighbour an investor is weighing.`],
+    ['Company marks', `Logos for ${Object.keys(D.logos).length} of the ${DIST.length} holders drawn were supplied by Omega Pacific and are used as supplied. A mark is a trademark, so one is shown only where the issuer provided it and only against the holder whose ground it is; every other block carries the registered name as text.`],
+    ['Operator names', 'EDITORIAL, not from the register. The register records the registered holder and nothing else, and in the Toodoggone those differ routinely: Sun Summit operates Theory and JD under option from Eagle Plains, and Kemess is Centerra\u2019s mine held by its subsidiary AuRico Metals. Holder names on this map are the register; operator and project names beneath them are ours.'],
+    ['Zone outlines', 'The convex hull of each zone\u2019s drilled collars, pushed out 300 m. This is the extent of DRILLING, not a mapped geological contact \u2014 nobody has walked a boundary here. Holes the source left unzoned are assigned to the nearer cluster and flagged as inferred in the data.'],
+    ['Terrain & imagery', 'Esri World Elevation 3D and World Imagery. Elevations are the public DEM, not a project survey.'],
+  ];
+  const pub = (D.drill.published || []).map(p =>
+    `<tr><td>${p.hole}</td><td>Reported ${p.reported}. Recomputed from the assay table over ${p.from}–${p.to} m: <b style="color:var(--gold);font-weight:400">${p.check}</b>.</td></tr>`).join('');
+  return `
+    <h2>What this deck is built from</h2>
+    <p class="lede">Every figure on every slide is computed from a file in the Williams data room or read from the BC mineral tenure register. None of it is illustrative and none of it is drawn by hand.</p>
+    <h3>Published intercepts, recomputed</h3>
+    <p class="note">The two intervals Omega Pacific has reported publicly were recomputed here from the raw sample table. They agree, which is the point: a deck whose headline disagrees with the news release gives a reader no way to tell which one is wrong.</p>
+    <table>${pub}</table>
+    <h3>Datasets</h3>
+    <table>${rows.map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>
+    <h3>Stage</h3>
+    <p class="note">Williams is an exploration-stage property. No mineral resource has been estimated and no block model exists, so this deck reports no tonnage, no contained metal and no economics. Drill intercepts are intercepts, not widths of a body, and grades shown along a trace are sample grades, not estimates of the rock between the holes.</p>
+    <h3>Not yet read</h3>
+    <p class="note">The data room also holds VTEM and DCIP voxels (.omf), magnetic and chargeability isosurfaces (.dxf, 1.4 GB), the 2005 IP survey as a scanned and georeferenced map sheet, and 279 MB of raw magnetic line data. Each is renderable and none of it is in this deck yet.</p>`;
+}
+
+{
+  $('#prov_in').innerHTML = sourcesHTML();
+  $('#prov_o').onclick = () => { $('#prov').classList.add('on'); $('#prov_c').focus(); };
+  $('#prov_c').onclick = () => $('#prov').classList.remove('on');
+}
+
+/* ---- go ----------------------------------------------------------------- */
+$('#editbtn').onclick = () => toggleEditor();
+if (new URLSearchParams(location.search).get('admin') === '1') toggleEditor(true);
+
+stat('placing the camera…');
+await go(0, true);
+setTimeout(() => { $('#stat').classList.add('gone');
+  setTimeout(() => $('#stat').style.display = 'none', 600); }, 700);
+</script>
