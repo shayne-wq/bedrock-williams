@@ -179,6 +179,37 @@ button{font:inherit;color:inherit}
   #txt td{display:block;padding-right:0}
 }
 
+/* ---- embed panel ---- */
+#emb{position:fixed;right:24px;top:118px;z-index:60;width:396px;display:none;
+  background:rgba(7,9,10,.96);backdrop-filter:blur(16px);
+  border:1px solid var(--gold);border-radius:var(--r);padding:15px 16px}
+#emb .hd{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--gold);display:flex;justify-content:space-between}
+#emb .hd button{background:none;border:0;color:var(--fg3);cursor:pointer;font-size:13px;padding:0}
+#emb .hd2{margin:14px 0 6px;font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--fg3)}
+#emb .rw{display:flex;align-items:center;gap:10px;margin-top:11px}
+#emb .rw label{flex:0 0 74px;font-family:'JetBrains Mono',monospace;font-size:9.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--fg3)}
+#emb select{flex:1;background:rgba(255,255,255,.07);color:var(--fg);
+  border:1px solid var(--line);border-radius:var(--r);padding:7px 8px;font:inherit;font-size:12.5px}
+#emb .ck{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;color:var(--fg2)}
+#emb .ck input{accent-color:var(--gold)}
+#emb textarea{width:100%;background:#0B0E10;color:var(--fg2);border:1px solid var(--line);
+  border-radius:var(--r);padding:10px;font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;line-height:1.5;resize:vertical}
+#emb .bt{display:flex;gap:8px;margin-top:10px}
+#emb button.x,#emb .bt button{flex:1;font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.08);
+  color:var(--fg);border:1px solid var(--line);border-radius:var(--r);padding:10px;cursor:pointer}
+#emb .bt button:first-child{background:var(--gold);border-color:var(--gold);color:#12100B}
+#emb .st{margin-top:9px;font-size:11px;line-height:1.5;color:var(--fg3)}
+
+/* An embed sits in someone else's page: no authoring, and the chrome tightens
+   up because the frame is usually a fraction of a screen. */
+html.embed #editbtn, html.embed #embedbtn, html.embed #admin, html.embed #emb{display:none!important}
+@media (max-width:1100px){ html.embed #rail{display:none} html.embed #scrimL{display:none} }
+
 /* ---- camera authoring panel ---- */
 #admin{position:fixed;left:24px;top:118px;z-index:60;width:236px;
   background:rgba(7,9,10,.95);backdrop-filter:blur(16px);
@@ -314,6 +345,7 @@ button{font:inherit;color:inherit}
   <div id="nav">
     <button class="btn" id="prov_o">Sources</button>
     <button class="btn" id="editbtn" aria-pressed="false">Edit</button>
+    <button class="btn" id="embedbtn" aria-pressed="false">Embed</button>
     <button class="btn" id="play" aria-pressed="false">Play</button>
     <button class="btn" id="prev" aria-label="Previous chapter">←</button>
     <span class="count mono" id="count">1 / 1</span>
@@ -353,6 +385,9 @@ const $ = s => document.querySelector(s);
 // fetched, how finely terrain is sampled, and whether rasters are
 // prefetched all key off it.
 const SMALL_SCREEN = matchMedia('(pointer: coarse)').matches || innerWidth < 900;
+const QS = new URLSearchParams(location.search);
+const EMBED = QS.has('embed');
+if (EMBED) document.documentElement.classList.add('embed');
 const stat = (m, err) => { const s=$('#stat'); s.classList.toggle('err',!!err); $('#stat_p').textContent=m; };
 const fail = m => { $('#stat').classList.remove('gone'); stat(m,true); throw new Error(m); };
 
@@ -1675,6 +1710,101 @@ function declutterLabels() {
   render();
 }
 
+/* ---- embed kit ------------------------------------------------------------
+   The deck is already frameable; what a non-technical person needs is the
+   snippet, sized correctly, with the disclosure attached to it.
+
+   The disclosure is written INTO the snippet rather than left to the deck's own
+   screen, because an embed lands in someone else's page and the sentence that
+   matters — no mineral resource has been estimated — has to survive being
+   pasted. The deck carries it on-slide as well, so deleting the caption still
+   cannot produce an embed that implies a resource. */
+const PUBLISHED = 'https://bedrock-fawn.vercel.app/williams/';
+const embBase = () => {
+  const u = location.origin + location.pathname;
+  // A snippet pointing at 127.0.0.1 is useless to everyone but its author.
+  return /^https?:\/\/(localhost|127\.|0\.0\.0\.0|\[::1\])/.test(u) ? PUBLISHED : u;
+};
+const EMB_CAPTION =
+  'Williams — Omega Pacific Resources, Toodoggone District, British Columbia. ' +
+  'Exploration-stage property: no mineral resource has been estimated and no ' +
+  'tonnage, grade or contained metal is stated. Interactive 3D deck by Bedrock.';
+
+function embedUI() {
+  document.body.insertAdjacentHTML('beforeend', `<div id="emb">
+    <div class="hd">Embed this deck <button id="em_close" title="Close">✕</button></div>
+    <div class="rw"><label>Shape</label>
+      <select id="em_ratio">
+        <option value="56.25">16 : 9 — widescreen</option>
+        <option value="62.5">16 : 10</option>
+        <option value="75">4 : 3 — taller</option>
+        <option value="42.85">21 : 9 — banner</option>
+      </select></div>
+    <div class="rw"><label>Opens on</label>
+      <select id="em_start">
+        <option value="1">Slide 1</option>
+        <option value="here">The slide showing now</option>
+      </select></div>
+    <label class="ck"><input type="checkbox" id="em_auto"> Play automatically</label>
+    <label class="ck"><input type="checkbox" id="em_cap" checked> Include the disclosure line</label>
+    <div class="hd2">Paste into a Custom HTML block</div>
+    <textarea id="em_code" readonly rows="9"></textarea>
+    <div class="bt"><button id="em_copy">Copy</button><button id="em_open">Preview</button></div>
+    <div class="st" id="em_note"></div>
+  </div>`);
+  const $$ = id => document.getElementById(id);
+  const src = () => {
+    let u = embBase().split('#')[0];
+    const q = ['embed=1'];
+    if (!$$('em_auto').checked) q.push('autoplay=0');
+    if ($$('em_start').value === 'here' && cur > 0) q.push('slide=' + (cur + 1));
+    return u + (u.includes('?') ? '&' : '?') + q.join('&');
+  };
+  const snippet = () => {
+    // Percentage padding, not aspect-ratio: WordPress and Elementor both strip
+    // or override modern CSS in places, and the padding trick has worked in
+    // every builder since 2010.
+    let out = '<!-- Williams — Omega Pacific · interactive 3D deck -->\n' +
+      '<div style="position:relative;width:100%;padding-top:' + $$('em_ratio').value + '%;' +
+      'border-radius:6px;overflow:hidden;background:#07090A">\n' +
+      '  <iframe src="' + src() + '"\n' +
+      '    title="Williams — Omega Pacific Resources"\n' +
+      '    loading="lazy" allowfullscreen\n' +
+      '    style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>\n' +
+      '</div>';
+    if ($$('em_cap').checked)
+      out += '\n<p style="font:12px/1.6 system-ui,-apple-system,sans-serif;' +
+             'color:#6b7580;margin:8px 0 0">' + EMB_CAPTION + '</p>';
+    return out;
+  };
+  const refresh = () => {
+    $$('em_code').value = snippet();
+    $$('em_note').textContent = embBase() === PUBLISHED
+      ? 'Pointing at the published deck, because this page is running locally.'
+      : 'Anyone who can open the deck can load this embed.';
+  };
+  ['em_ratio','em_start','em_auto','em_cap'].forEach(id =>
+    $$(id).addEventListener('change', refresh));
+  $$('em_copy').onclick = () => {
+    const t = snippet();
+    navigator.clipboard?.writeText(t).then(
+      () => { $$('em_note').textContent = 'Copied. Paste into a Custom HTML block.'; },
+      () => { $$('em_code').select(); document.execCommand('copy'); });
+  };
+  $$('em_open').onclick = () => window.open(src(), '_blank', 'noopener');
+  $$('em_close').onclick = () => toggleEmbed(false);
+  refresh();
+}
+let embedOpen = false;
+function toggleEmbed(on) {
+  embedOpen = on ?? !embedOpen;
+  if (embedOpen && !document.getElementById('emb')) embedUI();
+  const e = document.getElementById('emb');
+  if (e) e.style.display = embedOpen ? 'block' : 'none';
+  const b = document.getElementById('embedbtn');
+  if (b) b.setAttribute('aria-pressed', String(embedOpen));
+}
+
 /* ---- camera authoring ----------------------------------------------------
    Open with ?admin=1. Fly the view by hand, press Lock, and that slide keeps
    exactly what you framed.
@@ -2080,10 +2210,15 @@ function sourcesHTML() {
 
 /* ---- go ----------------------------------------------------------------- */
 $('#editbtn').onclick = () => toggleEditor();
+$('#embedbtn').onclick = () => toggleEmbed();
 if (new URLSearchParams(location.search).get('admin') === '1') toggleEditor(true);
 
 stat('placing the camera…');
-await go(0, true);
+const START = Math.max(1, Math.min(CH.length, +(QS.get('slide') || 1))) - 1;
+await go(START, START === 0);
+// An embed that autoplays is the default a page owner usually wants; ?autoplay=0
+// turns it off, and reduced-motion always wins.
+if (EMBED && QS.get('autoplay') !== '0' && !REDUCED) setTimeout(() => setPlay(true), 1200);
 setTimeout(() => { $('#stat').classList.add('gone');
   setTimeout(() => $('#stat').style.display = 'none', 600); }, 700);
 </script>
