@@ -131,6 +131,25 @@ sample means that sample and "171.6 – 179.4 m" is a worse answer than "172 –
 180 m" to the question they asked. It reports the metres assayed against the
 metres selected, so a window straddling an unsampled gap says so.
 
+**The answer goes beside the band, and onto the hole.** A number in a footer is
+something you look up; a number beside what you selected is something you read.
+So the interval and its grade sit against the band with a leader, the composite
+brackets step back to 22 % while a measurement is on screen — two gold labels in
+one column, one of them the answer to what you just asked for, is one too many —
+and the provenance stays below as the footnote it is.
+
+The same window is drawn on the trace in 3D as you drag it: the desurveyed path
+sampled between the two depths, so it follows the hole's real curvature instead
+of cutting the chord, with the measurement on a chip at its midpoint. That is
+the other half of the question — a reader dragging a band of colour wants to
+know what it runs at *and* where in the ground it is, and they are looking at
+the hole side-on while they ask. One entity with a callback for its positions,
+because this updates on every pointermove and rebuilding a primitive per frame
+would not survive a drag. The chip is cream-on-black rather than the callout's
+dark-on-gold: the focused card is already gold and sits a few pixels away, and
+two gold chips carrying different numbers about the same hole is the one
+confusion worth spending a colour to avoid.
+
 It is labelled as what it is: a measurement off the assay table, **not** a
 composite under the reported rule. That distinction is the whole reason the rule
 was recovered rather than chosen. Checked against the rule's own output —
