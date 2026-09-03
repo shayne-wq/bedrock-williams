@@ -121,6 +121,25 @@ name. Gram-metres is the default because that is what "performance" means on a
 drill programme: a metre of 10 g/t and ten metres of 1 g/t are the same
 discovery and neither grade nor length alone will say so.
 
+**Drag across the log and it measures what you dragged over.** A composite is
+the issuer's rule applied to the whole hole; the other question a reader in
+front of a drill log actually has is "what does THAT run at", pointing at a band
+of colour no composite happens to bracket. Length-weighted over the samples in
+the window — the only defensible way to average unequal sample lengths — with
+the ends snapped to sample boundaries, because a reader dragging over a 2 m
+sample means that sample and "171.6 – 179.4 m" is a worse answer than "172 –
+180 m" to the question they asked. It reports the metres assayed against the
+metres selected, so a window straddling an unsampled gap says so.
+
+It is labelled as what it is: a measurement off the assay table, **not** a
+composite under the reported rule. That distinction is the whole reason the rule
+was recovered rather than chosen. Checked against the rule's own output —
+dragging B83-2 from 50 to 62 m returns 12.00 m @ 6.66 g/t, which is its
+composite exactly; dragging WM22-02 across its published intercept returns
+96.90 m @ 2.15 against a reported 96.92 m @ 2.16. Where a raw window and a
+composite disagree by more than rounding, they are supposed to: the rule cuts at
+0.5 g/t and never ends on waste, and a dragged window does neither.
+
 Clicking a row, a rod, a collar or an intercept card opens that hole's **log** on
 the right: header stats, then every sampled interval drawn as a bar whose length
 is its grade and whose colour is the tier the 3D rod uses, with the composites
