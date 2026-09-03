@@ -27,7 +27,7 @@ await p.waitForFunction(() => document.querySelector('#stat')?.classList.contain
                         { timeout: 180000 });
 const n = await p.evaluate(() => document.querySelectorAll('#rail button').length);
 await p.addStyleTag({ content:
-  '#rail,#right,#panel,#layers,#legend,#zkey,#mark,#brand,#stage,#scrimL,#scrimR,#scrimB,#tip{display:none!important}' });
+  '#rail,#right,#panel,#layers,#strip,#cam,#legend,#zkey,#mark,#brand,#stage,#scrimL,#scrimR,#scrimB,#tip{display:none!important}' });
 
 for (let i = 0; i < n; i++) {
   await p.evaluate(k => window.__go(k), i);

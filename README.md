@@ -46,9 +46,11 @@ device that cannot run Cesium still sees what Cesium would have drawn. Re-run
 change, or the stills will quietly describe an older deck than the text does.
 
 `?ctxfail=N` forces the first N WebGL context attempts to fail, so the mobile
-fallback ladder and the text mode can be exercised on a desktop.
-`?ctxfail=3` renders the deck as text: same chapters, same figures, same
-sources, no globe. The chapter data is computed above the renderer precisely
+fallback ladder and the text mode can be exercised on a desktop. The ladder is
+four rungs, so `?ctxfail=4` renders the deck as text: same chapters, same
+figures, same sources, no globe. (It was three until a WebGL1 rung was added —
+N has to match the ladder, or the last rung quietly succeeds and nothing is
+being tested.) The chapter data is computed above the renderer precisely
 so both modes read from one place.
 
 A Bedrock deck built from a real client data room, running in **exploration
@@ -85,8 +87,43 @@ Room/` and is not committed.
 
 12 chapters in five sections: **the district** (who else holds ground in the
 Toodoggone) → **the property** (the claim block, then GIC and T-Bill) → **the
-evidence** (magnetics, geochem, IP) → **what has been drilled** → **what is
-next**.
+evidence** (magnetics, geochem, IP) → **what has been drilled** → **explore**.
+
+The last chapter hands the camera over. Eleven chapters each frame one thing;
+a reader who has followed them has questions nobody anticipated, and the only
+honest answer to those is the data with the camera unlocked. It opens with the
+claim block, both zones, all 45 drilled holes and their best intercepts, no
+geophysics, and every other layer one press away. The no-resource sentence stays
+in its copy — it is the last thing a reader sees and the one statement in the
+deck that is an obligation rather than an editorial choice.
+
+**Explore is a state of the page, not a badge on one card.** `body.explore`
+shrinks the caption, puts the layer switches on screen as a strip instead of
+behind the Layers dropdown, and adds the camera pad. The caption is a lectern:
+right for eleven slides where the camera is on rails, and squarely in the way
+the moment someone wants to look behind it — so on this chapter it says less, in
+less space, and the how-to it used to carry moved onto the controls themselves.
+
+**The hole list and the downhole log.** `Holes` in the transport row opens a
+ranked list of all 45 drilled holes — hole, zone, year, depth, best composite,
+how many composites — sortable by gram-metres, grade, length, depth, year or
+name. Gram-metres is the default because that is what "performance" means on a
+drill programme: a metre of 10 g/t and ten metres of 1 g/t are the same
+discovery and neither grade nor length alone will say so.
+
+Clicking a row, a rod, a collar or an intercept card opens that hole's **log** on
+the right: header stats, then every sampled interval drawn as a bar whose length
+is its grade and whose colour is the tier the 3D rod uses, with the composites
+bracketed beside them. That picture is the point — it is what says whether an
+intercept is fifty metres of consistent rock or one rich metre carrying an
+average, and no summary line can show it. Both panels read the same
+`D.drill.intercepts` the 3D callouts read, so a number in the list, a number on
+a card and a number in the log cannot drift apart.
+
+**Both control surfaces write the same state.** The strip and the dropdown panel
+share one set of setters and one `syncLays`/`syncGeo`; the layer buttons are the
+*readable* copy of that state, because `L.holes.show` is a setter with no getter.
+A second copy is how a checkbox comes to disagree with the map.
 
 Chapter 1 opens on British Columbia and flies in, waiting on
 `globe.tilesLoaded` rather than a fixed delay so it does not fly out of a blur.
@@ -94,6 +131,14 @@ Chapter 1 opens on British Columbia and flies in, waiting on
 The magnetic vertical gradient, the 2026 planned holes and the untested-ground
 view are all still loaded and toggleable from the Layers panel; they just do not
 have chapters of their own.
+
+**Zone names are their own switch.** They are the one label a reader needs off:
+they are the largest thing on the map and they sit over exactly the ground the
+drilling occupies — which is why the explore chapter starts with them off and
+the zone key, which is what the rod colours actually need, on. A chapter states
+its answer with `zoneLabels`, and either control surface can override it at any
+time, which is why label visibility is held in the zones layer rather than
+applied and forgotten.
 
 Layout: Omega Pacific mark and chapter rail top-left, *powered by Bedrock*
 bottom-left, caption and transport right, layer controls behind a **Layers**
@@ -187,6 +232,16 @@ and the tenure boundary in the browser, not typed into a slide.
   apart — and the logo goes on the largest block only.
 - **Grade callouts extend away from the caption, never alternating**, and a hole
   named in a callout drops its collar chip.
+- **Callouts are joined to their intercept by a leader.** A card parked clear of
+  the rock it describes is an unattributed claim until a line says which metre
+  it belongs to — which is why every deck that fans its cards draws one. Screen
+  space, on a 2D overlay, every frame: the offset that put the card there is in
+  pixels, so a world-space polyline would track the anchor and leave the card
+  behind, which is the one thing a leader must not do. Eighteen lines a frame is
+  nothing; re-solving the layout would be the expensive part, and that still
+  happens once. Halo then dash, like every other line in the scene. A leader is
+  skipped when its card is not wholly on screen — the declutter allows a card to
+  sit part-way off the edge, and a line running off frame points at nothing.
 - **Company marks are the issuer's supply, and only theirs.** A logo is a
   trademark, so one is drawn only where Omega Pacific provided the file and only
   against the holder whose ground it is; every other block carries the
@@ -212,6 +267,39 @@ and the tenure boundary in the browser, not typed into a slide.
 - **Label fades are near-binary.** A dark-backed label at 15 % alpha still shows
   its background over bright terrain but not its cream text, so a fading card
   reads as an empty box. The transition band is now 1 %: legible, or gone.
+- **Tilt was the control people gave up on.** Cesium ships right-drag as a
+  second zoom and puts tilt on the middle button — which a trackpad does not
+  have — or on ctrl-drag, which nobody guesses. Orbit is one drag and everybody
+  finds it; the angle you are looking *from* is the one that goes undiscovered.
+  So right-drag and shift-drag both tilt, the wheel keeps zoom to itself, and
+  the two rotations get buttons as well.
+- **The camera pad nudges around the point under the middle of the screen**, not
+  around the camera: rotating about the camera swings the subject out of frame,
+  so an orbit control has to find what you are looking at first — globe pick,
+  ellipsoid as the fallback, because over the horizon the first one returns
+  nothing and the button would be silently dead. It flies with the same
+  `flyToBoundingSphere` the chapters use, which is what lets **Reset** simply
+  re-run the chapter instead of maintaining a second copy of its framing.
+- **The pad is centred in what is free, not in the viewport.** The legend holds
+  the bottom-left and the caption the bottom-right, and the midpoint between
+  them is nowhere near the middle of the screen; at 1240 px the viewport centre
+  puts the pad through the legend. Solved from the two rectangles, with a fall
+  back to parking above the caption when the gap is narrower than the pad.
+- **Bottom-left is a measured stack, not three fixed offsets.** The legend is
+  one row on most chapters and two on the explore chapter, where downhole grade
+  and soil grade are both live — one key for two different numbers on two
+  different objects would be a lie. A zone key parked at a constant 140 px then
+  either sits on the legend or floats clear of it, so the key and the chapter
+  rail are positioned from measured heights instead.
+- **Hover reads a geochem sample as well as a drill hole.** Twelve of the 4,503
+  soil samples carry a printed grade; the other 4,491 needed somewhere to be
+  read, and the explore chapter is where someone asks. The raw row travels on
+  the point and the columns are looked up by name, because the phone build ships
+  gold only and a hard-coded index would read arsenic out of a shorter row.
+- **The explore chapter drops the geochem grade callouts and keeps the points.**
+  Those twelve cards sit on the same hot cores the drilling does; with rods,
+  zone names and soil all on at once they are the labels that lose. They are
+  still on chapter 5, which is about them.
 - **The next chapter's raster is prefetched.** An IP slice is a 1.5 MB PNG that
   must be fetched, decoded and uploaded; a 2.5 s flight is not long enough, and
   the deck was arriving at geophysics slides with no geophysics on them.

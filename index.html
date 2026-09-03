@@ -123,9 +123,93 @@ button{font:inherit;color:inherit}
   gap:12px;align-items:center;background:rgba(7,9,10,.82);backdrop-filter:blur(14px);
   border:1px solid var(--line);border-radius:var(--r);padding:9px 14px}
 #legend.on{display:flex}
+/* Two colour scales can be on at once — drill grade and soil grade — and a
+   single row of eleven keys runs under the caption card. Stacked, each scale
+   keeps its own heading and the card grows upward into space the scrim already
+   owns; the zone key steps up to make room rather than being overdrawn. */
+#legend.multi{flex-direction:column;align-items:flex-start;gap:7px}
+#legend .grp{display:flex;gap:12px;align-items:center}
 #legend .k{display:flex;align-items:center;gap:6px}
 #legend .k i{width:11px;height:11px;border-radius:2px}
 #legend span{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--fg2);white-space:nowrap}
+
+/* ---- explore chrome ----
+   The last chapter stops narrating and hands over, and the chrome has to change
+   shape with it. The caption card is a lectern: right for eleven slides where
+   the camera is on rails, and squarely in the way the moment someone wants to
+   look behind it. So on this chapter it says less, in less space, and the
+   controls that matter move out of a dropdown and onto the screen. */
+/* On explore the caption keeps only what it is obliged to keep. The screen now
+   says what the chapter used to explain — the strip names the layers, the pad
+   names the camera — and a paragraph restating them is the tallest thing on the
+   right-hand edge for no reason. The no-resource line stays: it is the one
+   sentence here that is a regulatory obligation, not a caption. */
+body.explore #cap{padding:13px 17px 14px;display:flex;flex-direction:column}
+body.explore #cap .ey,body.explore #cap h2{display:none}
+body.explore #cap .fig{order:1;margin-top:0;padding-top:0;border-top:0}
+body.explore #cap p{order:2;font-family:'JetBrains Mono',monospace;font-size:9px;
+  line-height:1.7;letter-spacing:.05em;color:var(--fg3);margin-top:12px;
+  padding-top:11px;border-top:1px solid rgba(255,255,255,.09)}
+body.explore #right{width:min(372px,calc(100vw - 300px))}
+body.explore #layers{display:none}
+body.explore #scrimR{opacity:.55}
+
+/* The layer switches, on screen rather than behind a button. Eleven chapters
+   choose their own layers and a dropdown is the right home for an override;
+   a chapter whose subject IS the switches has to show them. */
+#strip{position:fixed;top:20px;left:342px;right:230px;z-index:41;display:none;
+  flex-wrap:wrap;align-items:center;gap:8px 16px;
+  background:rgba(7,9,10,.88);backdrop-filter:blur(14px);border:1px solid var(--line);
+  border-radius:var(--r);padding:9px 14px}
+body.explore #strip{display:flex}
+#strip .grp{display:flex;align-items:center;gap:9px;min-width:0}
+#strip .grp.chips{flex-wrap:wrap;gap:6px}
+#strip .grp.chips #st_lays{display:flex;flex-wrap:wrap;gap:6px}
+#strip select[disabled],#strip input[disabled]{opacity:.4}
+#strip label,#strip .hd{font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--fg3);flex:none}
+#strip select{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--fg);
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);
+  border-radius:2px;padding:5px 8px;max-width:220px}
+#strip input[type=range]{width:64px;accent-color:var(--gold);height:2px;flex:none}
+#strip .chip{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);
+  border-radius:2px;padding:5px 9px;cursor:pointer;color:var(--fg3);
+  display:flex;align-items:center;gap:7px;transition:color .15s,background .15s}
+#strip .chip:hover{background:rgba(255,255,255,.11);color:var(--fg2)}
+#strip .chip i{width:7px;height:7px;border-radius:2px;border:1px solid rgba(255,255,255,.3);
+  flex:none}
+#strip .chip[aria-pressed="true"]{color:var(--fg);border-color:rgba(201,154,58,.55)}
+#strip .chip[aria-pressed="true"] i{background:var(--gold);border-color:var(--gold)}
+
+/* Tilt is the control people cannot find. Orbit is one drag and everyone tries
+   it; changing the angle you are looking from needs a modifier nobody guesses,
+   and on a trackpad the middle button does not exist. So the two rotations get
+   buttons, on the side of the screen the caption just gave back. */
+/* Bottom-centre, in the band the legend on one side and the caption on the
+   other leave empty — the one place a control cluster costs nothing. The exact
+   x is solved from those two rectangles rather than from the viewport centre,
+   which is not the centre of what is free. */
+#cam{position:fixed;bottom:26px;left:50%;z-index:41;display:none;
+  flex-direction:column;align-items:center;gap:6px;
+  background:rgba(7,9,10,.88);backdrop-filter:blur(14px);border:1px solid var(--line);
+  border-radius:var(--r);padding:9px 12px 8px}
+body.explore #cam{display:flex}
+#cam .pad{display:flex;align-items:center;gap:5px}
+#cam .pad .sep{width:1px;height:20px;background:rgba(255,255,255,.14);margin:0 5px;flex:none}
+#cam .pad button{width:32px;height:29px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);border-radius:2px;cursor:pointer;
+  font-size:13px;line-height:1;color:var(--fg2);display:flex;align-items:center;
+  justify-content:center;transition:background .15s,color .15s}
+#cam .pad button:hover{background:rgba(255,255,255,.15);color:var(--fg)}
+#cam .pad button:active{transform:translateY(1px)}
+#cam [data-a="reset"]{color:var(--gold)}
+#cam .lg{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--fg3);display:flex;width:100%;
+  justify-content:space-between;padding:0 6px}
+#cam .hint{margin:0;font-family:'JetBrains Mono',monospace;font-size:8px;line-height:1.6;
+  letter-spacing:.06em;color:rgba(142,148,142,.85);text-align:center;
+  padding-top:5px;border-top:1px solid rgba(255,255,255,.08);width:100%}
 
 /* ---- text mode ---- */
 #txt{position:fixed;inset:0;z-index:70;overflow-y:auto;background:var(--ink);
@@ -189,7 +273,7 @@ button{font:inherit;color:inherit}
 #emb .hd2{margin:14px 0 6px;font-family:'JetBrains Mono',monospace;font-size:9px;
   letter-spacing:.2em;text-transform:uppercase;color:var(--fg3)}
 #emb .rw{display:flex;align-items:center;gap:10px;margin-top:11px}
-#emb .rw label{flex:0 0 74px;font-family:'JetBrains Mono',monospace;font-size:9.5px;
+#emb .rw label{flex:0 0 74px;line-height:1.3;font-family:'JetBrains Mono',monospace;font-size:9.5px;
   letter-spacing:.14em;text-transform:uppercase;color:var(--fg3)}
 #emb select{flex:1;background:rgba(255,255,255,.07);color:var(--fg);
   border:1px solid var(--line);border-radius:var(--r);padding:7px 8px;font:inherit;font-size:12.5px}
@@ -203,6 +287,7 @@ button{font:inherit;color:inherit}
   letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.08);
   color:var(--fg);border:1px solid var(--line);border-radius:var(--r);padding:10px;cursor:pointer}
 #emb .bt button:first-child{background:var(--gold);border-color:var(--gold);color:#12100B}
+#emb .hint{margin-top:7px;font-size:11.5px;line-height:1.5;color:var(--fg3)}
 #emb .st{margin-top:9px;font-size:11px;line-height:1.5;color:var(--fg3)}
 
 /* An embed sits in someone else's page: no authoring, and the chrome tightens
@@ -275,6 +360,83 @@ html.embed #editbtn, html.embed #embedbtn, html.embed #admin, html.embed #emb{di
 #prov .note{font-family:Newsreader,Georgia,serif;font-size:16px;line-height:1.6;
   color:var(--fg2);max-width:68ch;margin:14px 0}
 
+/* ---- drill hole list + downhole log ----
+   The deck answers "what came out of this property" one chapter at a time. The
+   two questions it could not answer were "show me all of them" and "show me
+   this one" — a ranked list, and the log behind a single hole. They dock on
+   opposite edges so both can be open with the drilling still visible between
+   them, which is the whole point of opening either. */
+#holes,#log{position:fixed;top:110px;bottom:26px;z-index:44;display:none;
+  flex-direction:column;background:rgba(7,9,10,.96);backdrop-filter:blur(18px);
+  border:1px solid var(--line);border-radius:var(--r)}
+#holes.on,#log.on{display:flex}
+#holes{left:24px;width:334px}
+#log{right:24px;width:404px}
+#holes .hd,#log .hd{display:flex;align-items:baseline;gap:10px;padding:14px 16px 10px;
+  border-bottom:1px solid rgba(255,255,255,.09);flex:none}
+#holes .hd h3,#log .hd h3{margin:0;font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--fg3);flex:1}
+#holes .hd .x,#log .hd .x{background:none;border:0;cursor:pointer;color:var(--fg3);
+  font-size:14px;line-height:1;padding:0 2px}
+#holes .hd .x:hover,#log .hd .x:hover{color:var(--fg)}
+#holes .srt{display:flex;flex-wrap:wrap;gap:5px;padding:10px 16px;flex:none;
+  border-bottom:1px solid rgba(255,255,255,.07)}
+#holes .srt button{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);border-radius:2px;padding:4px 7px;cursor:pointer;
+  color:var(--fg3)}
+#holes .srt button:hover{color:var(--fg2);background:rgba(255,255,255,.1)}
+#holes .srt button[aria-pressed="true"]{color:#12100B;background:var(--gold);
+  border-color:var(--gold)}
+#holes .rows{overflow-y:auto;flex:1;scrollbar-width:thin}
+#holes .row{width:100%;text-align:left;background:none;border:0;cursor:pointer;
+  padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.05);display:block}
+#holes .row:hover{background:rgba(255,255,255,.05)}
+#holes .row[aria-current="true"]{background:rgba(201,154,58,.13);
+  box-shadow:inset 2px 0 0 var(--gold)}
+#holes .r1{display:flex;align-items:center;gap:7px;
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--fg)}
+#holes .r1 i{width:7px;height:7px;border-radius:2px;flex:none}
+#holes .r1 .m{margin-left:auto;font-size:9.5px;color:var(--fg3);letter-spacing:.06em}
+#holes .r2{margin-top:3px;padding-left:14px;font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;color:var(--gold);display:flex;gap:8px;align-items:baseline}
+#holes .r2.none{color:rgba(142,148,142,.7)}
+#holes .r2 .n{margin-left:auto;color:var(--fg3);font-size:9px;letter-spacing:.08em}
+#holes .ft,#log .ft{flex:none;padding:11px 16px;border-top:1px solid rgba(255,255,255,.09);
+  font-family:'JetBrains Mono',monospace;font-size:9px;line-height:1.75;letter-spacing:.05em;
+  color:var(--fg3)}
+#holes .ft b{color:var(--fg2);font-weight:400}
+
+#log .in{overflow-y:auto;flex:1;padding:14px 16px 18px;scrollbar-width:thin}
+#log .k{display:grid;grid-template-columns:repeat(3,1fr);gap:11px 10px;margin-bottom:14px}
+#log .k div b{display:block;font-family:'JetBrains Mono',monospace;font-size:12.5px;
+  font-weight:500;color:var(--fg)}
+#log .k div span{display:block;font-family:'JetBrains Mono',monospace;font-size:8.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--fg3);margin-top:2px}
+#log h4{margin:16px 0 8px;font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--fg3);
+  padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.09)}
+#log .cmp{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;
+  font-size:10.5px}
+#log .cmp td{padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);color:var(--fg2)}
+#log .cmp td:last-child{text-align:right;color:var(--gold)}
+#log .note{margin:10px 0 0;font-family:'JetBrains Mono',monospace;font-size:8.5px;
+  line-height:1.7;color:rgba(142,148,142,.85)}
+#log svg{display:block;width:100%;height:auto}
+#log .fly{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;
+  text-transform:uppercase;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.16);border-radius:2px;padding:5px 9px;cursor:pointer;
+  color:var(--fg2)}
+#log .fly:hover{background:rgba(255,255,255,.13);color:var(--fg)}
+@media (max-width:1240px){ #log{width:360px} #holes{width:300px} }
+
+/* Leader lines. A callout parked 200 px from the metre of rock it describes is
+   an unattributed claim until something joins them — which is why every deck
+   that fans its cards draws the line, and why this one now does too. Screen
+   space, because the offset that put the card there is in pixels: a world-space
+   polyline would track the anchor and ignore the card. */
+#leads{position:fixed;inset:0;z-index:20;pointer-events:none}
+
 /* ---- hole readout on hover ---- */
 #tip{position:fixed;z-index:45;pointer-events:none;display:none;
   background:rgba(7,9,10,.94);border:1px solid var(--line);border-radius:var(--r);
@@ -338,12 +500,41 @@ html.embed #editbtn, html.embed #embedbtn, html.embed #admin, html.embed #emb{di
   </div>
 </div>
 
+<div id="strip" aria-label="Layers">
+  <div class="grp"><label for="st_geo">Geophysics</label>
+    <select id="st_geo"></select>
+    <input id="st_gop" type="range" min="0" max="100" value="72" aria-label="Geophysics opacity">
+  </div>
+  <div class="grp chips"><span class="hd">Showing</span><span id="st_lays"></span></div>
+  <div class="grp"><label for="st_gnd">Ground</label>
+    <input id="st_gnd" type="range" min="12" max="100" value="100" aria-label="Ground opacity">
+  </div>
+</div>
+
+<div id="cam" aria-label="Camera controls">
+  <div class="pad">
+    <button data-a="rot-l"   title="Rotate left"  aria-label="Rotate left">↺</button>
+    <button data-a="rot-r"   title="Rotate right" aria-label="Rotate right">↻</button>
+    <span class="sep"></span>
+    <button data-a="tilt-up" title="Look from higher — steeper, more overhead" aria-label="Look from higher">▲</button>
+    <button data-a="tilt-dn" title="Look from lower — flatter, more side-on" aria-label="Look from lower">▼</button>
+    <span class="sep"></span>
+    <button data-a="out"     title="Zoom out" aria-label="Zoom out">−</button>
+    <button data-a="in"      title="Zoom in"  aria-label="Zoom in">+</button>
+    <span class="sep"></span>
+    <button data-a="reset"   title="Back to the opening view" aria-label="Reset the view">⌾</button>
+  </div>
+  <div class="lg"><span>rotate</span><span>tilt</span><span>zoom</span><span>reset</span></div>
+  <p class="hint">drag to move · shift-drag or right-drag to tilt · scroll to zoom</p>
+</div>
+
 <div id="legend" aria-live="polite"></div>
 <div id="zkey" aria-live="polite"></div>
 
 <div id="right">
   <div id="nav">
     <button class="btn" id="prov_o">Sources</button>
+    <button class="btn" id="holesbtn" aria-pressed="false">Holes</button>
     <button class="btn" id="editbtn" aria-pressed="false">Edit</button>
     <button class="btn" id="embedbtn" aria-pressed="false">Embed</button>
     <button class="btn" id="play" aria-pressed="false">Play</button>
@@ -360,6 +551,20 @@ html.embed #editbtn, html.embed #embedbtn, html.embed #admin, html.embed #emb{di
 </div>
 
 <div id="mark"><img src="data/bedrock-watermark.png" alt="Powered by Bedrock"></div>
+
+<canvas id="leads" aria-hidden="true"></canvas>
+
+<div id="holes" aria-label="Drill holes">
+  <div class="hd"><h3>Drill holes</h3><button class="x" id="hl_x" title="Close">✕</button></div>
+  <div class="srt" id="hl_srt"></div>
+  <div class="rows" id="hl_rows"></div>
+  <div class="ft" id="hl_ft"></div>
+</div>
+
+<div id="log" aria-label="Drill hole log">
+  <div class="hd"><h3 id="lg_t">Hole</h3><button class="x" id="lg_x" title="Close">✕</button></div>
+  <div class="in" id="lg_in"></div>
+</div>
 
 <div id="tip"></div>
 
@@ -556,11 +761,27 @@ CH = [
   fig:[[Z['T-Bill'].holes+'','holes'],['12.0 m @ 6.66','B83-2, g/t Au'],
        ['13.8 g/t','best single interval']] },
 
-{ sec:'What is next', ey:'Stage', t:'No resource has been estimated',
-  b:'Williams is an exploration-stage property and no mineral resource has been estimated. Nothing here states a tonnage, a grade-tonnage curve or an ounce count, because none has been established. What does exist: 13,056 metres of drilling, 5,526 geochemical samples, three geophysical surveys and eleven tenures — every figure traceable to its source.',
-  layers:['claims','zones','holes'], geo:null,
-  cam:{ lon:-127.767, lat:57.768, alt:1500, range:34500, heading:0, pitch:-48 },
-  fig:[['None','mineral resource'],['6','datasets'],[M.as_of.slice(0,10),'tenure as of']] },
+/* The deck ends by handing the camera over. Eleven chapters each show one
+   thing and frame it; a reader who has followed them has questions the author
+   did not anticipate, and the only honest answer to those is the data with the
+   camera unlocked. Every layer is reachable from the Layers panel here — this
+   chapter just decides which ones are already on.
+
+   The no-resource sentence stays in the copy. It is the last thing a reader
+   sees and it is the one statement in the deck that is a regulatory
+   obligation rather than an editorial choice; a slide that swaps it for an
+   invitation to explore is a worse slide, not a freer one. */
+{ sec:'Explore', ey:'Free navigation · the camera is yours',
+  t:'Explore the property',
+  b:'Exploration-stage property. No mineral resource has been estimated, and no tonnage, grade or contained metal is stated anywhere in this deck.',
+  bText:'The live deck ends in a free-navigation mode: the claim block, both zones and all 45 drill holes with their best intercepts, the camera unlocked, every other layer one press away, and a readout on any hole or sample you point at. It needs the 3D map, which this device could not start. Williams is an exploration-stage property: no mineral resource has been estimated, and nothing here states a tonnage or an ounce count.',
+  explore:true,
+  layers:['claims','zones','holes','picks'], geo:null, ground:.55,
+  legend:['au'], zoneLabels:false, zoneFill:true, geochemLabels:false,
+  cam:{ lon:-127.7690, lat:57.7930, alt:1500, range:13000, heading:0, pitch:-54 },
+  fig:[[dr.length+'','holes'],
+       [nf(D.drill.holes.reduce((a,h)=>a+(h.assay?h.assay.length:0),0)),'assayed samples'],
+       ['None','mineral resource']] },
 ];
 }
 
@@ -588,7 +809,7 @@ function textMode(probe, tried) {
       `<h2>${esc(c.t)}</h2>` +
       `<img class="shot" loading="lazy" decoding="async" src="data/slides/${n}.jpg"` +
       ` alt="${esc(c.t)}" onerror="this.remove()">` +
-      `<p>${esc(c.b)}</p>` +
+      `<p>${esc(c.bText || c.b)}</p>` +
       (c.fig && c.fig.length
         ? '<div class="fig">' + c.fig.map(([v, l]) =>
             `<div><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('') + '</div>'
@@ -879,7 +1100,9 @@ scene.globe.translucency.backFaceAlpha = 0;   // the far side of the planet is
                                               // not what "see into the hill" means
 scene.globe.undergroundColor = C('#0A0D0F');
 scene.globe.undergroundColorAlphaByDistance = new Cesium.NearFarScalar(600, .62, 3e4, .78);
+let groundNow = 1;
 function ground(a) {
+  groundNow = a;
   // Off, not "on at alpha 1". Translucency enabled with a full-opacity front
   // face still composites through undergroundColor and still draws the
   // rectangle's edge, so every chapter that does not need to see underground
@@ -889,12 +1112,27 @@ function ground(a) {
   // Depth testing against a surface you can see through hides the very thing
   // the translucency was turned on to reveal.
   scene.globe.depthTestAgainstTerrain = a > 0.92;
-  const el = document.querySelector('#gnd'); if (el) el.value = Math.round(a * 100);
+  for (const id of ['#gnd', '#st_gnd']) {
+    const el = document.querySelector(id); if (el) el.value = Math.round(a * 100);
+  }
   render();
 }
 scene.globe.enableLighting = false;
 if (!SMALL_SCREEN) { scene.fog.enabled = true; scene.skyAtmosphere.show = true; }
 scene.screenSpaceCameraController.enableCollisionDetection = true;
+/* Cesium ships right-drag as a SECOND zoom and puts tilt on the middle button —
+   which a trackpad does not have — or on ctrl-drag, which nobody guesses. Orbit
+   is one drag and everybody finds it; the angle you are looking from is the
+   control people give up on. So right-drag and shift-drag both tilt, the wheel
+   keeps zoom to itself, and the two rotations get buttons as well. */
+{
+  const E = Cesium.CameraEventType, K = Cesium.KeyboardEventModifier;
+  const ssc = scene.screenSpaceCameraController;
+  ssc.tiltEventTypes = [E.MIDDLE_DRAG, E.RIGHT_DRAG, E.PINCH,
+                        { eventType: E.LEFT_DRAG, modifier: K.SHIFT },
+                        { eventType: E.RIGHT_DRAG, modifier: K.CTRL }];
+  ssc.zoomEventTypes = [E.WHEEL, E.PINCH];
+}
 const render = () => scene.requestRender();
 window.viewer = viewer; window.__D = D;   // debugging + console access during a live present
 
@@ -1232,13 +1470,25 @@ let freezeDistrict = () => {};
     zlabels.push(lab);
   }
   viewer.dataSources.add(ds); ds.show = false;
+  // Label visibility is held rather than applied and forgotten, because two
+  // things now set it — the chapter on arrival, and the Layers panel at any
+  // time after — and a toggle that cannot read back the current state cannot
+  // be a checkbox.
+  let labOn = false, labOnly = null;
+  const applyLabels = () => zlabels.forEach(e =>
+    e.label.show = labOn && (!labOnly || e.__zone === labOnly));
   L.zones = { get show() { return ds.show; },
               set show(v) { ds.show = v; },
-              labels: (on, only) => zlabels.forEach(e =>
-                e.label.show = on && (!only || e.__zone === only)),
+              labels: (on, only) => { labOn = !!on; labOnly = only || null; applyLabels(); },
               // A tinted zone fill over a chargeability raster changes the
               // colour of the anomaly it is supposed to be framing.
               fill:   on => zfills.forEach(e => e.polygon.show = on) };
+  // Zone names are the one label a reader wants off: they sit in the middle of
+  // the ground the drilling occupies, and on the explore chapter that ground is
+  // the whole point. They ride the zones data source, so this only bites while
+  // GIC / T-Bill is on.
+  L.zonelabels = { get show() { return labOn; },
+                   set show(v) { labOn = !!v; applyLabels(); } };
 }
 
 /* ---- geochemistry ------------------------------------------------------- */
@@ -1273,7 +1523,11 @@ async function geochemLayer(set, el, size) {
     const v = p[col]; if (v == null) return;
     let t = 0; while (t < br.p.length && v >= br.p[t]) t++;
     if (t === 0) return;                       // below the median: context, not signal
-    pc.add({ position: cart(p[0], p[1], h[i] + 6),
+    // Carrying the raw row on the point is what makes the explore chapter work:
+    // the grade callouts label twelve samples and there are 4,503, so the other
+    // 4,491 have to be readable somehow, and hover is the only place left.
+    pc.add({ id: { geochem: set.medium || el, row: p },
+      position: cart(p[0], p[1], h[i] + 6),
       color: C(PCT[Math.min(t, PCT.length) - 1]).withAlpha(.94),
       pixelSize: size + t * (size * .34),
       scaleByDistance: new Cesium.NearFarScalar(2e3, 1.4, 3.4e4, .5),
@@ -1312,7 +1566,14 @@ async function geochemLayer(set, el, size) {
   }
   lc.show = false; scene.primitives.add(lc);
   const coll = scene.primitives.add(pc);
-  return { get show() { return pc.show; }, set show(v) { pc.show = lc.show = v; },
+  // The callouts and the point field are one layer on a chapter about geochem
+  // and two things on a chapter that has geochem in it. Twelve grade cards sit
+  // on the same hot cores the drilling does, and with the rods, the zone names
+  // and the soil all on at once they are the labels that lose.
+  let labOn = true;
+  return { get show() { return pc.show; },
+           set show(v) { pc.show = v; lc.show = v && labOn; },
+           labels: v => { labOn = !!v; lc.show = pc.show && labOn; },
            breaks: br };
 }
 stat('draping 5,526 geochemical samples on the DEM…');
@@ -1488,12 +1749,18 @@ async function showGeo(key) {
   }
   render();
 }
-$('#gnd').addEventListener('input', e => ground(e.target.value / 100));
-$('#gop').addEventListener('input', e => {
-  geoOpacity = e.target.value / 100;
-  for (const k in RAW) if (RAW[k].layer) RAW[k].layer.alpha = geoOpacity;
-  render();
-});
+// Both sliders exist twice — once in the panel, once on the strip — so each
+// writes the value and then repaints the other. ground() already writes #gnd.
+const setGround = v => { ground(v); $('#st_gnd').value = Math.round(v * 100); };
+for (const id of ['#gnd', '#st_gnd'])
+  $(id).addEventListener('input', e => setGround(e.target.value / 100));
+for (const id of ['#gop', '#st_gop'])
+  $(id).addEventListener('input', e => {
+    geoOpacity = e.target.value / 100;
+    $('#gop').value = $('#st_gop').value = e.target.value;
+    for (const k in RAW) if (RAW[k].layer) RAW[k].layer.alpha = geoOpacity;
+    render();
+  });
 
 /* ---- grade callouts ----------------------------------------------------- */
 /* Every hole that returned a composite carries its best one. Seven cards on a
@@ -1537,16 +1804,25 @@ $('#gop').addEventListener('input', e => {
       showBackground: true, backgroundColor: C('rgba(7,9,10,.9)'),
       backgroundPadding: new Cesium.Cartesian2(9,6),
       horizontalOrigin: Cesium.HorizontalOrigin.RIGHT,
-      pixelOffset: new Cesium.Cartesian2(-22, -14 - (n % 4) * 34),
+      // Parked clear of the anchor rather than against it. A card sitting 22 px
+      // from its own intercept needs no leader and reads as a tooltip; far
+      // enough out and the leader does the attributing, which is what lets the
+      // cards be somewhere legible instead of somewhere adjacent. Not further:
+      // every pixel of displacement is a card that stops fitting on screen.
+      pixelOffset: new Cesium.Cartesian2(-52, -15 - (n % 4) * 34),
       disableDepthTestDistance: Number.POSITIVE_INFINITY,
       // Below the top few, a card only earns its place once the reader is
       // close enough for it not to be one of forty overlapping rectangles.
       translucencyByDistance: (d => new Cesium.NearFarScalar(d, 1, d * 1.01, 0))(
         rank < 4 ? 16000 : 5000) }});
-    ds.entities.add({ position: mid, point: { pixelSize: 5, color: C('#F4E3B0'),
+    const dot = ds.entities.add({ position: mid, point: { pixelSize: 5, color: C('#F4E3B0'),
       disableDepthTestDistance: Number.POSITIVE_INFINITY }});
     const card = ds.entities.values[ds.entities.values.length - 2];
-    LBL.push({ ent: card,
+    // A card naming a hole is the most clickable thing on the slide. Entities
+    // pick as themselves, not as an id object, so the hole travels on the
+    // entity and the click handler looks in both places.
+    card.__hole = dot.__hole = i.hole;
+    LBL.push({ ent: card, lead: true,
                base: (card.label.pixelOffset && card.label.pixelOffset.getValue())
                      || new Cesium.Cartesian2(0, 0),
                pri: 700 - rank });      // gram-metre order, best kept longest
@@ -1578,30 +1854,78 @@ $('#gop').addEventListener('input', e => {
   });
 }
 
-/* ---- geophysics + layer controls --------------------------------------- */
+/* ---- geophysics + layer controls ---------------------------------------
+   TWO surfaces, one state. The dropdown panel is right for eleven chapters that
+   choose their own layers and only occasionally want an override; the explore
+   chapter's subject IS the switches, so it gets them on screen as a strip. Both
+   drive the same setters and both are repainted by the same sync, because a
+   second copy of the state is how a checkbox comes to disagree with the map. */
 {
-  const geo = $('#geo');
-  const add = (host, label, on, get) => {
+  const btnFor = (host, label, on) => {
     const b = document.createElement('button'); b.className = 'lay';
     b.innerHTML = `<i></i><span>${label}</span>`;
     b.setAttribute('aria-pressed','false'); b.onclick = on; host.append(b); return b;
   };
   const gbtns = {};
-  gbtns[''] = add(geo, 'None', () => { showGeo(null); syncGeo(); });
+  gbtns[''] = btnFor($('#geo'), 'None', () => { showGeo(null); syncGeo(); });
   for (const k of Object.keys(GEO))
-    gbtns[k] = add(geo, GEO[k].label, () => { showGeo(k); syncGeo(); });
-  window.syncGeo = () => { for (const k in gbtns)
-    gbtns[k].setAttribute('aria-pressed', String((geoOn || '') === k)); };
+    gbtns[k] = btnFor($('#geo'), GEO[k].label, () => { showGeo(k); syncGeo(); });
 
-  const lays = $('#lays'), lb = {};
+  // The strip's geophysics control is a select, not six buttons: the products
+  // are mutually exclusive and there is one row of screen to spend.
+  const gsel = $('#st_geo');
+  gsel.innerHTML = '<option value="">None</option>' +
+    Object.keys(GEO).map(k => `<option value="${k}">${GEO[k].label}</option>`).join('');
+  gsel.onchange = () => { showGeo(gsel.value || null); syncGeo(); };
+  window.syncGeo = () => {
+    for (const k in gbtns) gbtns[k].setAttribute('aria-pressed', String((geoOn || '') === k));
+    gsel.value = geoOn || '';
+    // A live slider with nothing under it reads as broken, not as inapplicable.
+    $('#st_gop').disabled = $('#gop').disabled = !geoOn;
+  };
+
   const T = { district:'District holders', claims:'Claim block', zones:'GIC / T-Bill',
+              zonelabels:'Zone names',
               holes:'Drill holes', planned:'Planned holes',
               soil:'Soil geochem', rock:'Rock geochem', picks:'Intercept callouts' };
+  // Shorter on the strip, which is one line of screen rather than a column.
+  const SHORT = { district:'District', claims:'Claims', zones:'Zones', zonelabels:'Zone names',
+                  holes:'Drill holes', planned:'Planned', soil:'Soil', rock:'Rock',
+                  picks:'Callouts' };
+  const lb = {};                       // layer key -> every button showing it
+  const toggle = k => {
+    const v = !lb[k].some(b => b.getAttribute('aria-pressed') === 'true');
+    setLayer(k, v);
+    for (const b of lb[k]) b.setAttribute('aria-pressed', String(v));
+    // A label hidden when the layout was last solved was left hidden at the
+    // ENTITY level too, so turning its layer back on without re-solving shows
+    // nothing and reads as a broken switch.
+    declutterLabels();
+    if (CH[cur] && CH[cur].explore) { autoLegend(); stackBottomLeft(); placeCam(); }
+    render();
+  };
   for (const k of Object.keys(T)) {
-    lb[k] = add(lays, T[k], () => { const v = lb[k].getAttribute('aria-pressed') !== 'true';
-      setLayer(k, v); lb[k].setAttribute('aria-pressed', String(v)); render(); });
+    const panelBtn = btnFor($('#lays'), T[k], () => toggle(k));
+    const chip = document.createElement('button');
+    chip.className = 'chip'; chip.innerHTML = `<i></i><span>${SHORT[k]}</span>`;
+    chip.setAttribute('aria-pressed','false'); chip.onclick = () => toggle(k);
+    $('#st_lays').append(chip);
+    lb[k] = [panelBtn, chip];
+    for (const b of lb[k]) b.dataset.k = k;
   }
-  window.syncLays = on => { for (const k in lb) lb[k].setAttribute('aria-pressed', String(on.has(k))); };
+  // What the controls say is on. The layers themselves are write-only —
+  // L.holes.show is a setter with no getter — so the buttons are the readable
+  // copy of the state.
+  window.layersOn = () => new Set(Object.keys(lb)
+    .filter(k => lb[k][0].getAttribute('aria-pressed') === 'true'));
+  window.syncLays = on => { for (const k in lb)
+    for (const b of lb[k]) b.setAttribute('aria-pressed', String(on.has(k))); };
+  // Anything that needs a layer on — flying to a hole from the list, say — goes
+  // through here, so the switches never disagree with what is drawn.
+  window.setLayerUI = (k, v) => {
+    if (!lb[k]) return;
+    if ((lb[k][0].getAttribute('aria-pressed') === 'true') !== !!v) toggle(k);
+  };
 }
 function setLayer(k, v) {
   const l = L[k]; if (!l) return;
@@ -1614,21 +1938,91 @@ function setLayer(k, v) {
    them what is in the ground, which is the question. Percentiles decide the
    colour because the data is lognormal; they do not have to be what is printed. */
 const g = v => v >= 10 ? v.toFixed(0) : v >= 1 ? v.toFixed(1) : v.toFixed(2);
+/* A chapter may run two colour scales at once — downhole grade and soil grade
+   are different numbers on different objects, and one key for both would be a
+   lie. So the legend takes a list and stacks a labelled group per scale. */
 function legend(kind) {
-  const el = $('#legend'); el.classList.toggle('on', !!kind); el.innerHTML = '';
-  if (!kind) return;
-  let head, items;
-  if (kind === 'au') {
-    head = 'Au g/t, downhole'; items = AU_TIERS.map(t => [t.c, t.label]);
-  } else {
-    const br = (kind === 'soil' ? D.soil : D.rock).breaks.au.p;
-    head = (kind === 'soil' ? 'Au g/t in soil' : 'Au g/t in rock');
-    items = PCT.slice(0, br.length).map((c, i) =>
-      [c, i === br.length - 1 ? `${g(br[i])} +` : `${g(br[i])} – ${g(br[i+1])}`]);
+  const kinds = (Array.isArray(kind) ? kind : kind ? [kind] : []).filter(Boolean);
+  const el = $('#legend');
+  el.classList.toggle('on', kinds.length > 0);
+  el.classList.toggle('multi', kinds.length > 1);
+  el.innerHTML = '';
+  for (const k of kinds) {
+    let head, items;
+    if (k === 'au') {
+      head = 'Au g/t, downhole'; items = AU_TIERS.map(t => [t.c, t.label]);
+    } else {
+      const br = (k === 'soil' ? D.soil : D.rock).breaks.au.p;
+      head = (k === 'soil' ? 'Au g/t in soil' : 'Au g/t in rock');
+      items = PCT.slice(0, br.length).map((c, i) =>
+        [c, i === br.length - 1 ? `${g(br[i])} +` : `${g(br[i])} – ${g(br[i+1])}`]);
+    }
+    const grp = document.createElement('div'); grp.className = 'grp';
+    grp.insertAdjacentHTML('beforeend', `<span style="color:var(--fg3)">${head}</span>`);
+    for (const [c, t] of items)
+      grp.insertAdjacentHTML('beforeend', `<div class="k"><i style="background:${c}"></i><span>${t}</span></div>`);
+    el.append(grp);
   }
-  el.insertAdjacentHTML('beforeend', `<span style="color:var(--fg3)">${head}</span>`);
-  for (const [c, t] of items)
-    el.insertAdjacentHTML('beforeend', `<div class="k"><i style="background:${c}"></i><span>${t}</span></div>`);
+}
+
+/* Bottom-left is a STACK, not three fixed offsets. The legend is one row on
+   most chapters and three when someone turns drilling, soil and rock on at
+   once, so a zone key parked at a constant 140 px either sits on top of it or
+   floats clear of it. Measure what is actually there and stack upward; the
+   chapter rail is scrollable and gives up its last 20 px rather than being
+   overlapped by the key that explains its colours. */
+function stackBottomLeft() {
+  const leg = $('#legend'), zk = $('#zkey'), rail = $('#rail');
+  const legH = leg.classList.contains('on') ? leg.offsetHeight : 0;
+  const zBot = legH ? 96 + legH + 12 : 140;
+  zk.style.bottom = zBot + 'px';
+  const zkH = zk.classList.contains('on') ? zk.offsetHeight : 0;
+  const bot = Math.max(206, zBot + (zkH ? zkH + 14 : 0));
+  rail.style.bottom = bot + 'px';
+  // The hole list docks over the rail and inherits its floor: it may cover the
+  // chapter list, which it replaces while open, but not the legend that
+  // explains the colours it is listing.
+  $('#holes').style.bottom = bot + 'px';
+}
+
+/* The camera pad is centred in what is FREE, not in the viewport: the legend
+   holds the bottom-left and the caption the bottom-right, and the midpoint
+   between them is nowhere near the middle of the screen. If the gap is narrower
+   than the pad — a small window, a wide legend — it parks above the caption
+   instead, where it costs width that was already being spent. */
+function placeCam() {
+  const cam = $('#cam'); if (!document.body.classList.contains('explore')) return;
+  const leg = $('#legend'), log = $('#log'), list = $('#holes');
+  // Whichever panel currently holds an edge is the one to clear — the log docks
+  // over the caption and the list over the rail, and either can be closed.
+  const right = log.classList.contains('on') ? log : $('#right');
+  const lBase = list.classList.contains('on')
+    ? list.getBoundingClientRect().right
+    : (leg.classList.contains('on') ? leg.getBoundingClientRect().right : 24);
+  const l = lBase + 20;
+  const r = right.getBoundingClientRect().left - 20;
+  const w = cam.offsetWidth || 290;
+  if (r - l >= w) {
+    cam.style.left = Math.round(Math.max(24, Math.min((l + r) / 2 - w / 2,
+                                 innerWidth - w - 24))) + 'px';
+    cam.style.bottom = '26px';
+  } else {
+    cam.style.left = Math.round(innerWidth - 24 - w) + 'px';
+    cam.style.bottom = (right.offsetHeight + 26 + 14) + 'px';
+  }
+}
+addEventListener('resize', () => { stackBottomLeft(); placeCam(); });
+
+/* On the explore chapter the legend follows the switches rather than the slide,
+   because the switches are the slide. Order is fixed — drilling, then soil,
+   then rock — so a key does not jump position when one is toggled. */
+function autoLegend() {
+  const on = window.layersOn ? window.layersOn() : new Set();
+  const k = [];
+  if (on.has('holes') || on.has('picks')) k.push('au');
+  if (on.has('soil')) k.push('soil');
+  if (on.has('rock')) k.push('rock');
+  legend(k);
 }
 
 /* Zones get their own key, always on once the zones layer is, because the rod
@@ -1733,13 +2127,14 @@ const EMB_CAPTION =
 function embedUI() {
   document.body.insertAdjacentHTML('beforeend', `<div id="emb">
     <div class="hd">Embed this deck <button id="em_close" title="Close">✕</button></div>
-    <div class="rw"><label>Shape</label>
+    <div class="rw"><label>Aspect<br>ratio</label>
       <select id="em_ratio">
-        <option value="56.25">16 : 9 — widescreen</option>
-        <option value="62.5">16 : 10</option>
-        <option value="75">4 : 3 — taller</option>
-        <option value="42.85">21 : 9 — banner</option>
+        <option value="56.25">16 : 9 — widescreen (usual choice)</option>
+        <option value="62.5">16 : 10 — a little taller</option>
+        <option value="75">4 : 3 — tallest, most map visible</option>
+        <option value="42.85">21 : 9 — short, wide banner</option>
       </select></div>
+    <div class="hint">The embed always fills the column width. This sets its height.</div>
     <div class="rw"><label>Opens on</label>
       <select id="em_start">
         <option value="1">Slide 1</option>
@@ -2027,20 +2422,36 @@ async function go(i, establish) {
   // Layers are armed BEFORE the camera moves, so the destination is drawn on
   // arrival rather than popping into existence once the flight has landed.
   const on = new Set(c.layers || []);
+  // Zone names default to off wherever something else is competing for the same
+  // ground, but a chapter can state it: the explore chapter wants them on over
+  // the geochem the default would have switched them off for.
+  const zlab = c.zoneLabels !== undefined ? c.zoneLabels
+             : (!on.has('soil') && !on.has('rock') && !on.has('picks'));
+  if (zlab && on.has('zones')) on.add('zonelabels');
   for (const k of Object.keys(L)) setLayer(k, on.has(k));
   if (window.__adminRefresh) setTimeout(window.__adminRefresh, 60);
   if (L.claims.nameplate) L.claims.nameplate(!!c.nameplate);
   if (L.holes.hush) L.holes.hush(on.has('picks'));
+  for (const k of ['soil','rock'])
+    if (L[k] && L[k].labels) L[k].labels(c.geochemLabels !== false);
   if (L.holes.only) L.holes.only(c.zone || null);
   syncLays(on);
   await showGeo(c.geo || null); syncGeo();
   ground(c.ground ?? 1);
   legend(c.legend);
   zoneKey((c.layers||[]).includes('zones') || (c.layers||[]).includes('holes'));
+  stackBottomLeft();
   if (L.zones.labels) {
-    L.zones.labels(!on.has('soil') && !on.has('rock') && !on.has('picks'), c.zone);
-    L.zones.fill(!c.geo);
+    L.zones.labels(zlab, c.zone);
+    L.zones.fill(c.zoneFill !== undefined ? c.zoneFill : !c.geo);
   }
+  // Explore is a state of the whole page, not a badge on one card: the caption
+  // shrinks, the layer strip appears and the camera pad takes the side of the
+  // screen the caption gave back. The dropdown panel closes, because the strip
+  // is the same switches and two of them open at once is one too many.
+  document.body.classList.toggle('explore', !!c.explore);
+  if (c.explore && window.__layerPanel) window.__layerPanel(false);
+  placeCam();
 
   $('#cap_e').textContent = chText(i, 'ey');
   $('#cap_t').textContent = chText(i, 't');
@@ -2123,6 +2534,9 @@ Object.defineProperty(window, 'geoOn', { get: () => geoOn });
   const setOpen = v => { pan.classList.toggle('open', v);
     btn.setAttribute('aria-expanded', String(v)); btn.setAttribute('aria-pressed', String(v)); };
   btn.onclick = e => { e.stopPropagation(); setOpen(!pan.classList.contains('open')); };
+  // The explore chapter opens it once: a slide whose subject is the switches
+  // cannot leave them behind a button nobody has pressed in eleven slides.
+  window.__layerPanel = setOpen;
   // Click-away closes it. A panel that covers a third of the scene and can only
   // be dismissed by finding the button again is a panel people leave open.
   addEventListener('pointerdown', e => {
@@ -2134,10 +2548,65 @@ Object.defineProperty(window, 'geoOn', { get: () => geoOn });
 $('#next').onclick = () => go(cur + 1);
 $('#prev').onclick = () => go(cur - 1);
 $('#play').onclick = () => setPlay(!playing);
+
+/* ---- camera pad ----------------------------------------------------------
+   Each button is a nudge around the point under the middle of the screen, not
+   around the camera: rotating about the camera swings the subject out of frame,
+   which is why an orbit control has to find what you are looking at first. The
+   same flyToBoundingSphere the chapters use, so a nudged view and a chapter
+   view are the same kind of thing and Reset can simply re-run the chapter. */
+const RAD = Cesium.Math.toRadians;
+function orbitState() {
+  const s = scene, c = s.camera;
+  const mid = new Cesium.Cartesian2(s.canvas.clientWidth / 2, s.canvas.clientHeight / 2);
+  const ray = c.getPickRay(mid);
+  // The globe first, the ellipsoid as a fallback: over the horizon or with the
+  // terrain not yet loaded, globe.pick returns nothing and the button would be
+  // silently dead.
+  let target = ray && s.globe.pick(ray, s);
+  if (!target) target = c.pickEllipsoid(mid, s.globe.ellipsoid);
+  if (!target) return null;
+  return { target, heading: c.heading, pitch: c.pitch,
+           range: Cesium.Cartesian3.distance(c.positionWC, target) };
+}
+function nudgeCamera({ dh = 0, dp = 0, k = 1 }) {
+  const st = orbitState(); if (!st) return;
+  // Clamped short of vertical and of the horizon: past -89° the heading becomes
+  // meaningless and past -6° you are looking at sky.
+  const pitch = Cesium.Math.clamp(st.pitch + dp, RAD(-89), RAD(-6));
+  const range = Cesium.Math.clamp(st.range * k, 400, 4e5);
+  viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(st.target, 1), {
+    offset: new Cesium.HeadingPitchRange(st.heading + dh, pitch, range),
+    duration: REDUCED ? 0 : .42, easingFunction: Cesium.EasingFunction.QUADRATIC_OUT,
+    complete: () => setTimeout(declutterLabels, 80) });
+  render();
+}
+{
+  const A = {
+    // "Up" is the viewpoint, not the horizon: the arrow that points up takes
+    // you higher, which is a steeper look down.
+    'tilt-up': () => nudgeCamera({ dp: RAD(-11) }),
+    'tilt-dn': () => nudgeCamera({ dp: RAD(11) }),
+    'rot-l':   () => nudgeCamera({ dh: RAD(-20) }),
+    'rot-r':   () => nudgeCamera({ dh: RAD(20) }),
+    'in':      () => nudgeCamera({ k: .6 }),
+    'out':     () => nudgeCamera({ k: 1.65 }),
+    // Reset re-runs the chapter: it re-arms the layers and re-flies the framing,
+    // rather than maintaining a second copy of where the chapter starts.
+    'reset':   () => go(cur),
+  };
+  for (const b of document.querySelectorAll('#cam .pad button'))
+    b.onclick = A[b.dataset.a];
+}
 addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
   if (e.key === 'ArrowLeft') go(cur - 1);
-  if (e.key === 'Escape') $('#prov').classList.remove('on');
+  if (e.key === 'Escape') {
+    $('#prov').classList.remove('on');
+    for (const id of ['#holes', '#log']) $(id).classList.remove('on');
+    $('#holesbtn').setAttribute('aria-pressed', 'false');
+    placeCam();
+  }
 });
 
 /* ---- hover readout ------------------------------------------------------ */
@@ -2148,7 +2617,23 @@ addEventListener('keydown', e => {
   h.setInputAction(m => {
     const p = scene.pick(m.endPosition);
     const id = p && p.id;
-    if (id && id.hole) {
+    if (id && id.geochem) {
+      // Column order travels with the file rather than being assumed: the
+      // phone build ships gold only, and an index hard-coded here would read
+      // arsenic out of a four-column row.
+      const set = id.geochem === 'rock' ? D.rock : D.soil;
+      const cols = set.cols || [], at = n => { const i = cols.indexOf(n);
+        return i >= 0 ? id.row[i] : null; };
+      const au = at('au_ppm'), yr = at('year');
+      const trace = [['Cu', at('cu_ppm')], ['As', at('as_ppm')], ['Ag', at('ag_ppm')]]
+        .filter(([, v]) => v != null).map(([k, v]) => `${k} ${v}`).join(' · ');
+      tip.innerHTML = `<b>${id.geochem === 'rock' ? 'Rock sample' : 'Soil sample'}</b>\n` +
+        [au != null ? `${au} g/t Au` : null, yr ? String(yr) : null, trace || null]
+          .filter(Boolean).join('\n');
+      tip.style.display = 'block';
+      tip.style.left = Math.min(m.endPosition.x + 16, innerWidth - 230) + 'px';
+      tip.style.top  = (m.endPosition.y + 16) + 'px';
+    } else if (id && id.hole) {
       const H = byId.get(id.hole);
       const lines = [`${H.id}`,
         `${H.status === 'planned' ? 'planned' : H.year} · ${H.zone || 'unassigned'}`,
@@ -2159,7 +2644,251 @@ addEventListener('keydown', e => {
       tip.style.left = Math.min(m.endPosition.x + 16, innerWidth - 230) + 'px';
       tip.style.top  = (m.endPosition.y + 16) + 'px';
     } else tip.style.display = 'none';
+    // Only a hole is clickable, so only a hole changes the cursor.
+    scene.canvas.style.cursor = (id && id.hole) ? 'pointer' : 'grab';
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+  // A rod you can hover is a rod a reader will click. Anything carrying a hole
+  // id — the collar, the trace, a grade bar — opens that hole's log.
+  h.setInputAction(m => {
+    const p = scene.pick(m.position);
+    const hid = p && p.id && (p.id.hole || p.id.__hole);
+    if (hid && window.__openLog) window.__openLog(hid);
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+}
+
+/* ---- drill hole list + downhole log ------------------------------------
+   The deck answered "what came out of this property" one chapter at a time. The
+   two questions it could not answer were "show me all of them", which is a
+   ranked list, and "show me this one", which is the log behind a single hole.
+
+   Both read the SAME composites the 3D callouts read — `D.drill.intercepts`,
+   computed by the recovered rule — so a number in the list, a number on a card
+   and a number in the log cannot drift apart. */
+const auHex = v => { for (const t of AU_TIERS) if (v >= t.min) return t.c; return null; };
+const HOLE = new Map(D.drill.holes.map(h => [h.id, h]));
+const CMP = new Map();                    // hole id -> composites, best first
+for (const i of D.drill.intercepts) {
+  if (i.el !== 'Au') continue;
+  if (!CMP.has(i.hole)) CMP.set(i.hole, []);
+  CMP.get(i.hole).push(i);
+}
+for (const a of CMP.values()) a.sort((x, y) => y.len * y.grade - x.len * x.grade);
+const bestOf = id => (CMP.get(id) || [])[0] || null;
+const gmOf = id => { const b = bestOf(id); return b ? b.len * b.grade : -1; };
+
+/* Flying to a hole frames the TRACE, not the collar: a 500 m hole seen from its
+   collar is a dot. Heading is left alone — a list click that spins the property
+   round costs the reader the orientation they just built. */
+function flyToHole(h) {
+  const pts = holePath(h);
+  const sph = Cesium.BoundingSphere.fromPoints(pts);
+  if (window.setLayerUI) window.setLayerUI('holes', true);
+  if (L.holes.only) L.holes.only(null);
+  ground(Math.min(groundNow, .45));
+  viewer.camera.flyToBoundingSphere(sph, {
+    offset: new Cesium.HeadingPitchRange(scene.camera.heading,
+              Cesium.Math.toRadians(-26), Math.max(700, sph.radius * 4.4)),
+    duration: REDUCED ? 0 : 1.7, easingFunction: Cesium.EasingFunction.QUADRATIC_IN_OUT,
+    complete: () => setTimeout(declutterLabels, 100) });
+  render();
+}
+
+/* The downhole log, drawn from the assay table rather than described from it.
+   Every sampled interval is a bar whose length is its grade and whose colour is
+   the same tier the 3D rod uses; the composites are bracketed beside them. What
+   a reader can then see — and no summary can show — is whether an intercept is
+   one rich metre carrying an average or fifty metres of consistent rock. */
+function stripLog(h) {
+  const A = (h.assay || []).filter(a => a[2] != null);
+  const deep = Math.max(h.depth || 0, ...A.map(a => a[1]), 1);
+  const W = 356, PADT = 12, PADB = 16;
+  const H = Math.max(230, Math.min(900, deep * 1.25));
+  const y = d => PADT + (d / deep) * (H - PADT - PADB);
+  const X0 = 38, COLW = 9, BARMAX = 112, BRK = 168;
+  // sqrt, not linear: two thirds of the table is under 0.3 g/t and a linear bar
+  // renders all of it as the same invisible stub.
+  const bw = au => 2 + Math.min(1, Math.sqrt(au / 12)) * BARMAX;
+  const esc = t => String(t).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const out = [`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Downhole gold assays for ${esc(h.id)}">`];
+
+  // depth ticks, on a round step chosen from the hole's own length
+  const raw = deep / 6;
+  const step = [10,20,25,50,100,150,200,250,500].find(v => v >= raw) || 500;
+  for (let d = 0; d <= deep + 0.1; d += step) {
+    out.push(`<line x1="${X0}" y1="${y(d).toFixed(1)}" x2="${X0 + COLW + BARMAX}" y2="${y(d).toFixed(1)}" stroke="rgba(255,255,255,.07)"/>`);
+    out.push(`<text x="${X0 - 6}" y="${(y(d) + 3).toFixed(1)}" text-anchor="end" fill="#8E948E" font-family="JetBrains Mono, monospace" font-size="8">${d}</text>`);
+  }
+  // the hole itself, then every sampled interval on top of it
+  out.push(`<rect x="${X0}" y="${y(0).toFixed(1)}" width="${COLW}" height="${(y(deep) - y(0)).toFixed(1)}" fill="rgba(255,255,255,.09)"/>`);
+  for (const [f, t, au] of A) {
+    const c = auHex(au); if (!c) continue;
+    const hh = Math.max(0.7, y(t) - y(f));
+    out.push(`<rect x="${X0}" y="${y(f).toFixed(1)}" width="${bw(au).toFixed(1)}" height="${hh.toFixed(1)}" fill="${c}" opacity=".95"/>`);
+  }
+  // composites, bracketed and labelled, pushed down when two would collide
+  let lastY = -99;
+  for (const i of (CMP.get(h.id) || []).slice().sort((a, b) => a.from - b.from)) {
+    const y1 = y(i.from), y2 = y(i.to);
+    out.push(`<path d="M ${BRK + 5} ${y1.toFixed(1)} H ${BRK} V ${y2.toFixed(1)} H ${BRK + 5}" fill="none" stroke="#C99A3A" stroke-width="1"/>`);
+    let ly = Math.max((y1 + y2) / 2, lastY + 12); lastY = ly;
+    out.push(`<line x1="${BRK}" y1="${((y1 + y2) / 2).toFixed(1)}" x2="${BRK + 12}" y2="${ly.toFixed(1)}" stroke="rgba(201,154,58,.5)" stroke-width="1"/>`);
+    out.push(`<text x="${BRK + 16}" y="${(ly + 3).toFixed(1)}" fill="#F4E3B0" font-family="JetBrains Mono, monospace" font-size="9.5">${i.len} m @ ${Number(i.grade).toFixed(2)} g/t</text>`);
+  }
+  out.push('</svg>');
+  return out.join('');
+}
+
+function logHTML(h) {
+  const esc = t => String(t).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const A = (h.assay || []).filter(a => a[2] != null);
+  const cmp = CMP.get(h.id) || [];
+  const K = [
+    [h.zone || 'unassigned', 'zone'],
+    [h.year, 'drilled'],
+    [(h.depth ?? 0) + ' m', 'depth'],
+    [h.az != null ? h.az.toFixed(0) + '°' : '—', 'azimuth'],
+    [h.inc != null ? h.inc.toFixed(0) + '°' : '—', 'dip'],
+    [nf(A.length), 'assays'],
+  ];
+  const pub = (D.drill.published || []).find(x => x.hole === h.id);
+  return `<div class="k">${K.map(([v, l]) =>
+      `<div><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>
+    <button class="fly" id="lg_fly">Fly to this hole</button>
+    <h4>Downhole gold — ${nf(A.length)} sampled interval${A.length === 1 ? '' : 's'}</h4>
+    ${A.length ? stripLog(h)
+      : '<p class="note">No assay intervals are recorded against this hole in the data room.</p>'}
+    <h4>Composites — ${cmp.length || 'none'}</h4>
+    ${cmp.length ? `<table class="cmp">${cmp.slice().sort((a,b) => a.from - b.from).map(i =>
+        `<tr><td>${i.from} – ${i.to} m</td><td>${i.len} m</td><td>${Number(i.grade).toFixed(2)} g/t Au</td></tr>`).join('')}</table>`
+      : '<p class="note">Nothing in this hole composites above the cut-off.</p>'}
+    ${pub ? `<p class="note">Reported publicly as <b style="color:var(--gold);font-weight:400">${esc(pub.reported)}</b>; recomputed here from the raw sample table over ${pub.from}–${pub.to} m as ${esc(pub.check)}.</p>` : ''}
+    <p class="note">Composites use the rule recovered from Omega Pacific's own published intercepts: ${esc(D.drill.rule)}. Bar length is grade on a square-root scale; colour is the same tier the 3D trace uses. An intercept is an intercept, not a width of a body.</p>`;
+}
+
+let selHole = null;
+function openLog(id) {
+  const h = HOLE.get(id); if (!h) return;
+  selHole = id;
+  $('#lg_t').textContent = h.id + (h.status === 'planned' ? ' · planned' : '');
+  $('#lg_in').innerHTML = logHTML(h);
+  $('#lg_in').scrollTop = 0;
+  const fly = document.getElementById('lg_fly');
+  if (fly) fly.onclick = () => flyToHole(h);
+  $('#log').classList.add('on');
+  for (const b of document.querySelectorAll('#hl_rows .row'))
+    b.setAttribute('aria-current', String(b.dataset.id === id));
+  placeCam();
+}
+
+/* ---- the list ---------------------------------------------------------- */
+{
+  const drilled = D.drill.holes.filter(h => h.status !== 'planned');
+  const SORTS = {
+    'grade·m': (a, b) => gmOf(b.id) - gmOf(a.id),
+    'grade':   (a, b) => (bestOf(b.id)?.grade ?? -1) - (bestOf(a.id)?.grade ?? -1),
+    'length':  (a, b) => (bestOf(b.id)?.len ?? -1) - (bestOf(a.id)?.len ?? -1),
+    'depth':   (a, b) => (b.depth || 0) - (a.depth || 0),
+    'year':    (a, b) => (b.year || 0) - (a.year || 0) || gmOf(b.id) - gmOf(a.id),
+    'hole':    (a, b) => String(a.id).localeCompare(String(b.id), 'en', { numeric: true }),
+  };
+  // Gram-metres first, because that is what "performance" means on a drill
+  // programme: a metre of 10 g/t and ten metres of 1 g/t are the same discovery
+  // and neither grade nor length alone will say so.
+  let sortKey = 'grade·m';
+  const srt = $('#hl_srt'), rows = $('#hl_rows');
+  for (const k of Object.keys(SORTS)) {
+    const b = document.createElement('button');
+    b.textContent = k; b.setAttribute('aria-pressed', String(k === sortKey));
+    b.onclick = () => { sortKey = k;
+      for (const q of srt.children) q.setAttribute('aria-pressed', String(q.textContent === k));
+      paint(); };
+    srt.append(b);
+  }
+  function paint() {
+    rows.innerHTML = '';
+    for (const h of [...drilled].sort(SORTS[sortKey])) {
+      const best = bestOf(h.id), all = CMP.get(h.id) || [];
+      const b = document.createElement('button');
+      b.className = 'row'; b.dataset.id = h.id;
+      b.setAttribute('aria-current', String(h.id === selHole));
+      b.innerHTML =
+        `<div class="r1"><i style="background:${ZONE[h.zone] || '#8E948E'}"></i>` +
+        `<span>${h.id}</span><span class="m">${h.year} · ${Math.round(h.depth)} m</span></div>` +
+        (best
+          ? `<div class="r2"><span>${best.len} m @ ${Number(best.grade).toFixed(2)} g/t Au</span>` +
+            `<span class="n">${all.length > 1 ? all.length + ' composites' : '1 composite'}</span></div>`
+          : `<div class="r2 none"><span>no composite above cut-off</span></div>`);
+      b.onclick = () => { openLog(h.id); flyToHole(h); };
+      rows.append(b);
+    }
+  }
+  paint();
+  const withCmp = drilled.filter(h => CMP.has(h.id)).length;
+  $('#hl_ft').innerHTML =
+    `<b>${drilled.length}</b> holes drilled · <b>${nf(Math.round(drilled.reduce((a,h)=>a+h.depth,0)))} m</b> · ` +
+    `<b>${withCmp}</b> with a composite above cut-off<br>` +
+    `${pl.length} planned holes (${nf(Math.round(pl.reduce((a,h)=>a+h.depth,0)))} m) are not drilled and carry no results.`;
+
+  const setHoles = v => { $('#holes').classList.toggle('on', v);
+    $('#holesbtn').setAttribute('aria-pressed', String(v)); placeCam(); };
+  $('#holesbtn').onclick = () => setHoles(!$('#holes').classList.contains('on'));
+  $('#hl_x').onclick = () => setHoles(false);
+  $('#lg_x').onclick = () => { $('#log').classList.remove('on'); selHole = null;
+    for (const b of rows.querySelectorAll('.row')) b.setAttribute('aria-current','false');
+    placeCam(); };
+  window.__paintHoles = paint;
+}
+window.__openLog = openLog;
+
+/* ---- leader lines ------------------------------------------------------
+   Drawn in screen space on a 2D overlay, every frame. The card's position is a
+   PIXEL offset solved by the declutter pass, so a world-space polyline would
+   follow the anchor and leave the card behind — which is the one thing a leader
+   must not do. Eighteen lines a frame is nothing; re-solving the layout would
+   have been the expensive part, and that still happens once. */
+{
+  const cv = $('#leads'), g = cv.getContext('2d');
+  scene.postRender.addEventListener(() => {
+    const S = scene, w = S.canvas.clientWidth, h = S.canvas.clientHeight;
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) {
+      cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+      cv.style.width = w + 'px'; cv.style.height = h + 'px';
+    }
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, w, h);
+    if (!L.picks || !L.picks.show) return;
+    const seg = [];
+    for (const it of LBL) {
+      if (!it.lead) continue;
+      const e = it.ent;
+      if (e.show === false || (e.label && e.label.show === false)) continue;
+      const pos = e.position && e.position.getValue();
+      const p = pos && Cesium.SceneTransforms.worldToWindowCoordinates(S, pos);
+      if (!p) continue;
+      const off = (e.label.pixelOffset && e.label.pixelOffset.getValue());
+      if (!off || (Math.abs(off.x) < 6 && Math.abs(off.y) < 6)) continue;
+      // A leader running off the edge of the frame to a card nobody can see is
+      // a line pointing at nothing. The declutter allows a card to sit part-way
+      // off screen; the leader does not follow it there.
+      const m = measure(e);
+      const x1 = p.x + off.x, cy = p.y + off.y;
+      if (x1 - m.w < 0 || x1 > w || cy - m.h / 2 < 0 || cy + m.h / 2 > h) continue;
+      // horizontalOrigin RIGHT, vertical CENTER: the card's right edge sits at
+      // the offset, so that is the end the line has to meet.
+      seg.push([p.x + off.x + 2, p.y + off.y, p.x, p.y]);
+    }
+    if (!seg.length) return;
+    const run = () => { g.beginPath();
+      for (const [x1, y1, x2, y2] of seg) { g.moveTo(x1, y1); g.lineTo(x2, y2); }
+      g.stroke(); };
+    // Halo then line, the same way every trace in the scene is drawn: a 1 px
+    // dash is invisible over pale terrain and lost over dark.
+    g.setLineDash([]); g.strokeStyle = 'rgba(6,8,9,.55)'; g.lineWidth = 2.6; run();
+    g.setLineDash([2, 3]); g.strokeStyle = 'rgba(244,227,176,.72)'; g.lineWidth = 1; run();
+    g.setLineDash([]);
+  });
 }
 
 /* ---- sources ------------------------------------------------------------ */
