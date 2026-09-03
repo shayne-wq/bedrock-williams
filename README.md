@@ -26,11 +26,21 @@ Press **Edit** in the deck. Per slide you can:
 * **Edit the caption** — eyebrow, title, body. The caption repaints as you type
   and the chapter rail picks up retitles.
 
-Edits save to `localStorage` as you work. **Copy changes** emits a
-`CAM_FIXED` / `TEXT_FIXED` block; paste it over the placeholders in
-`index.html` so the deck ships with them instead of depending on one browser.
-Re-run `capture.mjs` + `optimise_slides.py` afterwards so the no-WebGL stills
-match.
+Edits save to `localStorage` as you work — which is a note to self, not a
+decision the deck carries. **Save index.html** closes that loop: the page
+fetches its own source, splices the current locks over the `CAM_FIXED` and
+`TEXT_FIXED` literals it already declares, and hands back the result as a
+download. Replace `williams/index.html` with that file, redeploy, and every
+visitor gets the camera — no browser involved. **Copy changes** still emits the
+same block for pasting by hand. The panel lists which slides are locked and
+which have edited text, because an editor that will not tell you what you have
+changed is one you have to remember for. Re-run `capture.mjs` +
+`optimise_slides.py` afterwards so the no-WebGL stills match.
+
+`?admin=1` opens the editor on load. It used to open it *before* the first
+chapter, when `cur` is still -1 and `CH[-1]` is where the whole page stopped —
+so the deck never finished loading and a camera locked under it looked like it
+had not saved, because nothing had. It runs after `go()` now.
 
 `diag.html` runs four escalating graphics tests on a device, with a copy button.
 
