@@ -63,7 +63,7 @@ no tonnage, no contained metal and no economics anywhere in it.
     python3 claims.py      # BC mineral tenure (live) → data/claims.geojson
     python3 logos.py       # neighbour logo plates    → data/logos/
     node   capture.mjs             # chapter stills   → data/slides/*.png
-    python3 optimise_slides.py     # …as shippable JPEG (1.5 MB for twelve)
+    python3 optimise_slides.py     # …as shippable JPEG (1.3 MB for twelve)
     python3 -m http.server 8899 && open http://127.0.0.1:8899/
 
 Requires `pyproj` and `Pillow`. Source data lives in `../OMega/99-Williams Data
@@ -120,6 +120,48 @@ average, and no summary line can show it. Both panels read the same
 `D.drill.intercepts` the 3D callouts read, so a number in the list, a number on
 a card and a number in the log cannot drift apart.
 
+**Nothing on the map answers a click until the explore chapter.** Eleven
+chapters are a presentation: the reader's job is to look and to press next, and
+a deck that opens a data panel under someone's cursor mid-sentence has
+interrupted its own argument. `body.explore` gates the click handler, the hover
+line that says "click for the downhole log", the pointer cursor, the boxes that
+advertise clickability and the `Holes` button — and leaving the chapter closes
+whatever the mode opened. The mode is toggled at the TOP of `go()`, before
+anything downstream reads it, because the layers arm and the camera is aimed
+further down the same function.
+
+**A box marks the holes that have something to open.** 22 of the 45 composite
+above the cut-off; the other 23 are rods with a hover readout and nothing
+behind them, and a reader who clicks three of those in a row concludes the map
+is not clickable. The 22 carry a small gold box above the collar — a pin, the
+way any map says "there is a thing here" — and the other collars are drawn
+dimmer and smaller so the boxes are what the eye finds. It is also a 15 px click
+target where the collar dot was 6.
+
+**The hole you asked for is the only thing at full strength.** Selecting one
+keeps its trace, its grade bars, its collar and its callout at their own colours
+and drops everything else to 14 % alpha; the selected card turns gold with dark
+type and stops obeying its distance fade, and the leaders fade with the cards
+they belong to. Fading the others rather than merely brightening the one is what
+makes it read — brightness is relative, and against a field of forty-four
+equally bright rods there is nothing to be brighter than. Every trace instance
+carries its hole id and the colour it was drawn in, because repainting
+forty-four of them means having something to repaint them back to.
+
+**Flying to a hole arrives side-on.** A hole is a line going down, and arriving
+above one shows a dot with a shadow — the single view in which a 500 m intercept
+has no length. `flyToHole` stands off at the hole's own azimuth plus 90°, which
+puts its dip plane in the screen plane and its whole trace across the frame,
+drops the pitch to -12°, and pulls the ground translucency down, because most of
+a drill hole is inside the hill.
+
+**A clicked geochem sample opens every element the survey assayed.** Hover can
+carry three numbers before it becomes a paragraph following the cursor; the
+panel carries all five, each placed against that survey's own distribution,
+because 110 ppm of copper means nothing until you know 137 is the second break
+and 20,500 is the top of the range. The percentile breaks travel in the data for
+exactly this.
+
 **Both control surfaces write the same state.** The strip and the dropdown panel
 share one set of setters and one `syncLays`/`syncGeo`; the layer buttons are the
 *readable* copy of that state, because `L.holes.show` is a setter with no getter.
@@ -143,6 +185,45 @@ applied and forgotten.
 Layout: Omega Pacific mark and chapter rail top-left, *powered by Bedrock*
 bottom-left, caption and transport right, layer controls behind a **Layers**
 dropdown, legends bottom-left.
+
+**The deck is a 16:9 stage, not a window.** Every camera here is framed for one
+shape. The aim shift reserves a 240 px rail and a 470 px caption and derives the
+rest from the canvas, which holds at any size — but the composition does not: a
+1432 x 659 window is 2.17:1, and a shot framed for 16:9 arrives there with its
+subject squeezed into a slot the deck never designed. So the deck takes 16:9 out
+of the window it is given and centres it, the way a projector does. The
+`transform` on `body` is load-bearing rather than decorative: it makes `body` the
+containing block for every `position:fixed` element, so all the chrome lands on
+the stage instead of in the corners of the browser. Not on a phone, where
+letterboxing throws away the only dimension that is short; not in an embed, where
+the site owner picked the box and the deck's job is to fill it; not in text mode,
+which is a document. The stills are captured at 16:9 for the same reason — a
+viewport of any other shape bakes the letterbox bars into every one of them.
+
+**Chrome is measured against the stage, and against itself.** The layer strip is
+one row on a wide stage and two on a narrow one, so the panels that open under
+it take their top from its measured height rather than a stated offset; the
+legend, zone key and chapter rail stack upward from the legend's measured
+height; the camera pad targets the middle of the stage and is pushed aside only
+by whatever actually holds the bottom corners. Every one of these was a constant
+first and every one of them was wrong at some window size.
+
+**The legend is a ramp, not a sentence.** Six labelled chips reading "0.03 –
+0.17", "0.17 – 0.47" and so on ran 660 px along the bottom of the frame for a
+quantity a reader already understands is continuous. Contiguous swatches with
+the value each band starts at underneath say the same thing in a third of the
+width, and the shape of the scale becomes visible instead of being inferred from
+six rectangles.
+
+**The transport is the floor of the caption card.** Moving through the deck is
+the one thing every reader has to do, and it was the least visible control on
+screen: a 34 px arrow in a row of six buttons that all looked alike, on a row
+that was wider than the card beneath it and grew past its left edge. Sources,
+Holes, Edit, Embed and Play are now a utility row that shares the card's width;
+the arrows, the count and a segment per chapter are a footer inside it, with its
+own rule above. Forward is the move the deck is asking for, so `next` is the one
+that looks like an action, and both arrows disable at the ends — an arrow that
+does nothing teaches a reader it is not the way forward.
 
 ## Three things worth knowing
 

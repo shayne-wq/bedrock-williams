@@ -20,8 +20,9 @@ const b = await chromium.launch({
   executablePath: '/Users/shaynetaker/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing',
   args: ['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--no-sandbox'],
 });
-// 3:2, wide enough to read a zone label on a phone and small enough to ship.
-const p = await b.newPage({ viewport: { width: 1320, height: 880 } });
+// 16:9 — the shape the deck now presents in. The viewport has to BE 16:9 or the
+// stage letterboxes inside it and every still ships with black bands baked in.
+const p = await b.newPage({ viewport: { width: 1344, height: 756 } });
 await p.goto(URL_, { waitUntil: 'load', timeout: 180000 });
 await p.waitForFunction(() => document.querySelector('#stat')?.classList.contains('gone'),
                         { timeout: 180000 });
