@@ -230,6 +230,32 @@ its answer with `zoneLabels`, and either control surface can override it at any
 time, which is why label visibility is held in the zones layer rather than
 applied and forgotten.
 
+**The deck opens on a title card and waits to be launched.** A deck embedded in
+someone else's page has no business starting itself: it lands mid-scroll in a
+column of text, spins up a WebGL context and flies a camera at a reader who has
+not looked at it yet — and by the time they do, the establishing shot, the one
+frame that says where in the world this is, has already happened. So the cover
+holds, and **Launch** runs it.
+
+The loading state lives on the button rather than on a second splash: two
+full-screen screens in a row is one more than the deck has anything to say on.
+Chapter one's establishing frame is parked and its tiles fetched while the cover
+is up, so Launch flies rather than waits — the reader is reading the title card
+either way, and that is the time to spend. Enter or space works too; a title
+card with one action on it should not need a mouse.
+
+`?cover=0` skips it, as does an embed set to play automatically — a page that
+asked for the deck to run did not ask anyone to press anything. The decision is
+made in an inline script before a pixel is painted, and the module reads the
+class back, so there is one answer to the question rather than two. The embed
+kit carries it as a checkbox, on by default.
+
+The cover has its own still. Chapter one's is the district map, and using it put
+four competitors' logos and their project names behind an Omega Pacific title
+card; `data/cover.jpg` is the claim block on its ridge with the Toodoggone
+behind it, captured with every label off and cropped above a coarse terrain tile
+the LOD would not refine.
+
 Layout: Omega Pacific mark and chapter rail top-left, *powered by Bedrock*
 bottom-left, caption and transport right, layer controls behind a **Layers**
 dropdown, legends bottom-left.

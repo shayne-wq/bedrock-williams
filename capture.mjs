@@ -13,7 +13,9 @@
 import pkg from '/Users/shaynetaker/node_modules/playwright-core/index.js';
 import { fileURLToPath } from 'node:url';
 const { chromium } = pkg;
-const URL_ = process.argv[2] || 'http://127.0.0.1:8899/index.html';
+// ?cover=0: the title card is for readers, and a still of it is not a still of
+// the chapter it is covering.
+const URL_ = process.argv[2] || 'http://127.0.0.1:8899/index.html?cover=0';
 const OUT = fileURLToPath(new URL('./data/slides/', import.meta.url));
 
 const b = await chromium.launch({

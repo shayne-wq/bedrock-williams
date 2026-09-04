@@ -3,7 +3,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Williams — Omega Pacific · Bedrock Present</title>
 <meta name="robots" content="noindex, nofollow">
-<script>window.CESIUM_BASE_URL='https://cdn.jsdelivr.net/npm/cesium@1.120/Build/Cesium/';</script>
+<script>window.CESIUM_BASE_URL='https://cdn.jsdelivr.net/npm/cesium@1.120/Build/Cesium/';
+/* Decided here, before a pixel is painted, rather than at the end of a fifteen
+   second module: a page that asked NOT to have a title card should not stare at
+   one while the deck loads behind it. The module reads this class back so there
+   is one answer to the question and not two. */
+(function () {
+  var q = new URLSearchParams(location.search);
+  var auto = q.has('embed') && q.get('autoplay') !== '0' &&
+             !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (q.get('cover') === '0' || auto) document.documentElement.classList.add('nocover');
+})();</script>
 <link href="https://cdn.jsdelivr.net/npm/cesium@1.120/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/cesium@1.120/Build/Cesium/Cesium.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -424,6 +434,69 @@ html.embed #editbtn, html.embed #embedbtn, html.embed #admin, html.embed #emb{di
 #stat.err .p{color:#D98A72;text-transform:none;letter-spacing:.02em;max-width:38ch;
   font-family:Archivo,sans-serif;font-size:13px;line-height:1.5}
 
+/* ---- the cover ----
+   A deck embedded in someone else's page has no business starting itself. It
+   lands mid-scroll in a column of text, spins up a WebGL context and flies a
+   camera at a reader who has not looked at it yet — and by the time they do,
+   the establishing shot, which is the one frame that says where in the world
+   this is, has already happened. So the deck opens on a title card and waits.
+
+   It is also the only screen a reader sees before deciding whether to press
+   anything, so it carries the property, the three numbers that matter and the
+   stage disclosure, over the still of chapter one. The loading state lives on
+   the button rather than on a second splash: two full-screen screens in a row
+   is one more than the deck has anything to say on. */
+#cover{position:fixed;inset:0;z-index:65;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;background:var(--ink);
+  transition:opacity .55s ease, visibility .55s}
+#cover.gone{opacity:0;visibility:hidden;pointer-events:none}
+/* Its own still, not chapter one's: that one is the district map, and it would
+   have put four competitors' logos and their project names behind an Omega
+   Pacific title card. This is the claim block on its ridge with the Toodoggone
+   behind it, captured with every label off, cropped above a coarse terrain tile
+   the LOD refuses to refine. Desaturated and dimmed — it is the ground the
+   title sits on, not the picture. */
+#cover .bg{position:absolute;inset:0;background-image:url(data/cover.jpg);
+  background-size:cover;background-position:50% 46%;opacity:.62;
+  filter:saturate(.6) brightness(.95) contrast(1.04)}
+#cover .veil{position:absolute;inset:0;
+  background:radial-gradient(115% 88% at 50% 44%,rgba(7,9,10,.34) 0%,rgba(7,9,10,.8) 58%,#07090A 100%)}
+#cover .in{position:relative;text-align:center;padding:0 24px;max-width:640px}
+#cover .in>img{height:82px;width:auto;display:block;margin:0 auto 22px}
+#cover .w{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.34em;
+  color:var(--gold);text-transform:uppercase}
+#cover h1{margin:12px 0 8px;font-size:52px;font-weight:600;letter-spacing:-.032em;
+  line-height:1.05}
+#cover .s{font-size:14px;color:var(--fg2)}
+#cover .f{display:flex;justify-content:center;gap:0 34px;flex-wrap:wrap;margin:26px 0 30px;
+  padding:16px 0;border-top:1px solid rgba(255,255,255,.12);
+  border-bottom:1px solid rgba(255,255,255,.12)}
+#cover .f div b{display:block;font-family:'JetBrains Mono',monospace;font-size:16px;
+  font-weight:500;color:var(--fg)}
+#cover .f div span{display:block;font-family:'JetBrains Mono',monospace;font-size:8.5px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--fg3);margin-top:5px}
+#cover .go{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.24em;
+  text-transform:uppercase;background:var(--gold);border:1px solid var(--gold);
+  color:#12100B;border-radius:var(--r);padding:15px 44px;cursor:pointer;
+  transition:filter .18s,transform .06s}
+#cover .go:hover{filter:brightness(1.12)}
+#cover .go:active{transform:translateY(1px)}
+#cover .go[disabled]{background:transparent;color:var(--fg3);
+  border-color:rgba(255,255,255,.18);cursor:default}
+/* The disclosure lands over the tenure outlines in the backdrop, and it is the
+   one line on this screen that is not allowed to be hard to read. */
+#cover .d{margin-top:26px;font-family:'JetBrains Mono',monospace;font-size:8.5px;
+  line-height:1.85;letter-spacing:.06em;color:rgba(160,166,160,.92);max-width:52ch;
+  margin-left:auto;margin-right:auto;text-shadow:0 1px 4px rgba(7,9,10,.95)}
+#cover .s,#cover .f div span{text-shadow:0 1px 4px rgba(7,9,10,.8)}
+#cover .by{position:absolute;left:0;right:0;bottom:34px;display:flex;justify-content:center}
+#cover .by img{height:22px;width:auto;opacity:.7}
+html.textmode #cover,html.nocover #cover{display:none}
+@media (max-width:900px){
+  #cover h1{font-size:36px} #cover .in>img{height:60px}
+  #cover .f{gap:0 22px;margin:20px 0 24px} #cover .go{padding:14px 34px}
+}
+
 /* ---- stage badge: exploration, and what that means ---- */
 #stage{position:fixed;top:22px;right:24px;z-index:40;display:flex;gap:9px;align-items:center;
   background:rgba(7,9,10,.82);backdrop-filter:blur(14px);border:1px solid var(--line);
@@ -694,6 +767,21 @@ html.embed #editbtn, html.embed #embedbtn, html.embed #admin, html.embed #emb{di
 <div id="prov" role="dialog" aria-modal="true" aria-label="Sources">
   <button class="btn close" id="prov_c">Close</button>
   <div class="in" id="prov_in"></div>
+</div>
+
+<div id="cover">
+  <div class="bg"></div><div class="veil"></div>
+  <div class="in">
+    <img src="data/omega-mark.png" alt="Omega Pacific Resources">
+    <div class="w">Omega Pacific Resources</div>
+    <h1>Williams</h1>
+    <div class="s">Toodoggone District, British Columbia</div>
+    <div class="f" id="cv_f"></div>
+    <button class="go" id="cv_go" disabled>Loading…</button>
+    <div class="d">Exploration-stage property. No mineral resource has been estimated,
+      and no tonnage, grade or contained metal is stated anywhere in this deck.</div>
+  </div>
+  <div class="by"><img src="data/bedrock-watermark.png" alt="Powered by Bedrock"></div>
 </div>
 
 <div id="stat">
@@ -1306,6 +1394,7 @@ function atDepth(pts, cum, depth) {
    geochem points drops a frame exactly when the camera is moving.
    ──────────────────────────────────────────────────────────────────────────── */
 const L = {};
+window.__L = L;                 // console access during a live present
 const prims = () => scene.primitives.add(new Cesium.PrimitiveCollection());
 
 /* Set once the district layout has been solved at the opening frame. */
@@ -2442,7 +2531,10 @@ function embedUI() {
         <option value="1">Slide 1</option>
         <option value="here">The slide showing now</option>
       </select></div>
-    <label class="ck"><input type="checkbox" id="em_auto"> Play automatically</label>
+    <label class="ck"><input type="checkbox" id="em_cover" checked> Open on a title card
+      with a Launch button</label>
+    <label class="ck"><input type="checkbox" id="em_auto"> Play automatically
+      (skips the title card)</label>
     <label class="ck"><input type="checkbox" id="em_cap" checked> Include the disclosure line</label>
     <div class="hd2">Paste into a Custom HTML block</div>
     <textarea id="em_code" readonly rows="9"></textarea>
@@ -2454,6 +2546,7 @@ function embedUI() {
     let u = embBase().split('#')[0];
     const q = ['embed=1'];
     if (!$$('em_auto').checked) q.push('autoplay=0');
+    if (!$$('em_cover').checked) q.push('cover=0');
     if ($$('em_start').value === 'here' && cur > 0) q.push('slide=' + (cur + 1));
     return u + (u.includes('?') ? '&' : '?') + q.join('&');
   };
@@ -2480,7 +2573,7 @@ function embedUI() {
       ? 'Pointing at the published deck, because this page is running locally.'
       : 'Anyone who can open the deck can load this embed.';
   };
-  ['em_ratio','em_start','em_auto','em_cap'].forEach(id =>
+  ['em_ratio','em_start','em_auto','em_cover','em_cap'].forEach(id =>
     $$(id).addEventListener('change', refresh));
   $$('em_copy').onclick = () => {
     const t = snippet();
@@ -3590,7 +3683,56 @@ $('#editbtn').onclick = () => toggleEditor();
 $('#embedbtn').onclick = () => toggleEmbed();
 stat('placing the camera…');
 const START = Math.max(1, Math.min(CH.length, +(QS.get('slide') || 1))) - 1;
-await go(START, START === 0);
+
+/* The cover is on unless the page owner has asked for it not to be: ?cover=0,
+   or an embed set to play automatically, which is a page saying it wants the
+   deck running without anyone pressing anything. */
+const AUTO = EMBED && QS.get('autoplay') !== '0' && !REDUCED;
+const COVER = !document.documentElement.classList.contains('nocover');
+
+if (COVER) {
+  // Three numbers, computed like every other number in the deck rather than
+  // typed onto the cover.
+  $('#cv_f').innerHTML = [
+    [ha(M.subject_ha) + ' ha', 'held, 100% owned'],
+    [dr.length + ' holes', nf(Math.round(dr.reduce((a, h) => a + h.depth, 0))) + ' m drilled'],
+    [CH.length + ' chapters', 'interactive 3D'],
+  ].map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('');
+
+  // Park the camera on chapter one's establishing frame and let its tiles
+  // arrive behind the cover, so Launch flies rather than waits. The reader is
+  // reading the title card either way; that is the time to spend.
+  const f = frameFor({ cam: CH[0].from }, true);
+  viewer.camera.lookAt(f.target, f.offset);
+  viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+  render();
+  await new Promise(done => {
+    const t0 = Date.now();
+    const tick = () => {
+      if (scene.globe.tilesLoaded || Date.now() - t0 > 8000) return done();
+      render(); requestAnimationFrame(tick);
+    };
+    tick();
+  });
+  $('#stat').classList.add('gone');
+  const btn = $('#cv_go');
+  btn.disabled = false;
+  btn.textContent = 'Launch';
+  let launched = false;
+  btn.onclick = async () => {
+    if (launched) return; launched = true;
+    $('#cover').classList.add('gone');
+    await go(START, START === 0);
+  };
+  // Enter or space from the cover starts it too — a title card with one action
+  // on it should not need a mouse.
+  addEventListener('keydown', e => {
+    if (!launched && (e.key === 'Enter' || e.key === ' ') &&
+        !$('#cover').classList.contains('gone')) { e.preventDefault(); btn.click(); }
+  });
+} else {
+  await go(START, START === 0);
+}
 // AFTER the first chapter, not before it. The editor paints itself from the
 // current slide, and before go() there is no current slide — `cur` is -1, and
 // CH[-1] is where the whole page stopped. ?admin=1 has been opening a deck that
@@ -3598,8 +3740,9 @@ await go(START, START === 0);
 // like it had not been saved: nothing had been.
 if (new URLSearchParams(location.search).get('admin') === '1') toggleEditor(true);
 // An embed that autoplays is the default a page owner usually wants; ?autoplay=0
-// turns it off, and reduced-motion always wins.
-if (EMBED && QS.get('autoplay') !== '0' && !REDUCED) setTimeout(() => setPlay(true), 1200);
+// turns it off, and reduced-motion always wins. It skips the cover, because a
+// page that asked for the deck to run did not ask anyone to press anything.
+if (AUTO) setTimeout(() => setPlay(true), 1200);
 setTimeout(() => { $('#stat').classList.add('gone');
   setTimeout(() => $('#stat').style.display = 'none', 600); }, 700);
 </script>
